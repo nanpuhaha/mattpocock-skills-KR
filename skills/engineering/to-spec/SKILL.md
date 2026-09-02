@@ -1,75 +1,71 @@
 ---
 name: to-spec
-description: "Turn the current conversation into a spec and publish it to the project issue tracker: no interview, just synthesis of what you've already discussed."
+description: "현재 대화 내용을 기술 스펙(Spec)으로 변환하여 이슈 트래커에 등록합니다. 추가 인터뷰 없이 이미 논의된 내용을 종합합니다."
 disable-model-invocation: true
 ---
 
-This skill takes the current conversation context and codebase understanding and produces a spec. Do NOT interview the user; just synthesize what you already know.
+현재 대화 컨텍스트와 코드베이스 이해도를 바탕으로 기술 스펙을 작성합니다. 사용자를 추가로 인터뷰하지 말고 이미 알고 있는 내용을 종합하세요.
 
-The issue tracker and triage label vocabulary should have been provided to you. If not, tell the user to run `/setup-matt-pocock-skills`.
+이슈 트래커와 트리아지 라벨이 미리 설정되어 있어야 합니다. 설정되지 않은 경우 사용자에게 `/setup-matt-pocock-skills`를 실행하도록 안내하세요.
 
-## Process
+## 프로세스
 
-1. Explore the repo to understand the current state of the codebase, if you haven't already. Use the project's domain glossary vocabulary throughout the spec, and respect any ADRs in the area you're touching.
+1. 아직 탐색하지 않았다면 코드베이스의 현재 상태를 파악하세요. 스펙 전반에 걸쳐 프로젝트 도메인 용어집의 어휘를 사용하고 관련 영역의 ADR을 준수하세요.
 
-2. Sketch out the seams at which you're going to test the feature. Existing seams should be preferred to new ones. Use the highest seam possible. If new seams are needed, propose them at the highest point you can. The fewer seams across the codebase, the better - the ideal number is one.
+2. 기능을 테스트할 경계선(Seams)을 스케치합니다. 새로운 경계선보다 기존 경계선을 우선 사용하며, 가능한 한 가장 높은 지점의 경계선을 활용하세요. 경계선 수가 적을수록 좋습니다 (이상적인 개수는 1개).
 
-Check with the user that these seams match their expectations.
+이 경계선들이 사용자의 기대와 일치하는지 확인하세요.
 
-3. Write the spec using the template below, then publish it to the project issue tracker. Apply the `ready-for-agent` triage label - no need for additional triage.
+3. 아래 템플릿을 사용하여 스펙을 작성한 뒤 프로젝트 이슈 트래커에 게시합니다. 별도의 추가 분류가 필요 없도록 `ready-for-agent` 트리아지 라벨을 적용하세요.
 
 <spec-template>
 
-## Problem Statement
+## 문제 정의 (Problem Statement)
 
-The problem that the user is facing, from the user's perspective.
+사용자 관점에서 겪고 있는 문제 상황.
 
-## Solution
+## 해결 방안 (Solution)
 
-The solution to the problem, from the user's perspective.
+사용자 관점에서의 해결책.
 
-## User Stories
+## 유저 스토리 (User Stories)
 
-A LONG, numbered list of user stories. Each user story should be in the format of:
+번호가 매겨진 상세한 유저 스토리 목록. 각 유저 스토리는 다음 형식을 따릅니다:
 
-1. As an <actor>, I want a <feature>, so that <benefit>
+1. <주체>로서, <이점>을 위해 <기능>을 원한다.
 
 <user-story-example>
-1. As a mobile bank customer, I want to see balance on my accounts, so that I can make better informed decisions about my spending
+1. 모바일 뱅킹 고객으로서, 지출 결정을 더 현명하게 내리기 위해 계좌 잔액을 확인하고 싶다.
 </user-story-example>
 
-This list of user stories should be extremely extensive and cover all aspects of the feature.
+유저 스토리 목록은 기능의 모든 측면을 포괄할 만큼 충분히 상세해야 합니다.
 
-## Implementation Decisions
+## 구현 결정 사항 (Implementation Decisions)
 
-A list of implementation decisions that were made. This can include:
+합의된 구현 결정 목록:
+- 구축/수정될 모듈 목록
+- 수정될 해당 모듈들의 인터페이스
+- 개발자의 기술적 명확화 사항
+- 아키텍처 결정 사항
+- 스키마 변경점
+- API 계약
+- 구체적인 상호작용 방식
 
-- The modules that will be built/modified
-- The interfaces of those modules that will be modified
-- Technical clarifications from the developer
-- Architectural decisions
-- Schema changes
-- API contracts
-- Specific interactions
+특정 파일 경로나 코드 스니펫은 쉽게 구식이 되므로 포함하지 마세요. (예외: 프로토타입에서 도출된 핵심 결정 스니펫 제외)
 
-Do NOT include specific file paths or code snippets. They may end up being outdated very quickly.
+## 테스트 결정 사항 (Testing Decisions)
 
-Exception: if a prototype produced a snippet that encodes a decision more precisely than prose can (state machine, reducer, schema, type shape), inline it within the relevant decision and note briefly that it came from a prototype. Trim to the decision-rich parts, not a working demo, just the important bits.
+합의된 테스트 결정 사항:
+- 좋은 테스트의 기준 (내부 구현 세부사항이 아닌 외부 동작만 검증)
+- 테스트 대상 모듈
+- 코드베이스 내 유사 테스트 참조 사례
 
-## Testing Decisions
+## 범위 제외 항목 (Out of Scope)
 
-A list of testing decisions that were made. Include:
+이번 스펙 범위에서 명시적으로 제외할 사항.
 
-- A description of what makes a good test (only test external behavior, not implementation details)
-- Which modules will be tested
-- Prior art for the tests (i.e. similar types of tests in the codebase)
+## 추가 참고 사항 (Further Notes)
 
-## Out of Scope
-
-A description of the things that are out of scope for this spec.
-
-## Further Notes
-
-Any further notes about the feature.
+기타 참고할 추가 사항.
 
 </spec-template>

@@ -1,71 +1,67 @@
 ---
 name: improve-codebase-architecture
-description: Scan a codebase for deepening opportunities, present them as a visual HTML report, then grill through whichever one you pick.
+description: 코드베이스를 스캔하여 모듈 심화(Deepening) 기회를 탐색하고, 시각적 HTML 리포트로 제시한 뒤 선택한 대상에 대해 심문(인터뷰)을 진행합니다.
 disable-model-invocation: true
 ---
 
-# Improve Codebase Architecture
+# 코드베이스 아키텍처 개선 (Improve Codebase Architecture)
 
-Surface architectural friction and propose **deepening opportunities**: refactors that turn shallow modules into deep ones. The aim is testability and AI-navigability.
+아키텍처 상의 마찰 지점을 수면 위로 끌어올리고 **모듈 심화(Deepening) 기회**를 제안합니다: 얕은 모듈을 깊은 모듈로 전환하는 리팩터링입니다. 목표는 테스트 용이성과 AI의 탐색 용이성 확보입니다.
 
-This command is _informed_ by the project's domain model and built on a shared design vocabulary:
+이 명령어는 프로젝트의 도메인 모델을 바탕으로 하며, 공유된 설계 어휘 위에서 동작합니다:
 
-- Call the Skill tool with "codebase-design" for the architecture vocabulary (**module**, **interface**, **depth**, **seam**, **adapter**, **leverage**, **locality**) and its principles (the deletion test, "the interface is the test surface", "one adapter = hypothetical seam, two = real"). Use these terms exactly in every suggestion, and don't drift into "component," "service," "API," or "boundary."
-- The domain language in `GLOSSARY.md` gives names to good seams; ADRs in `docs/adr/` record decisions this command should not re-litigate.
+- Skill 도구를 "codebase-design"으로 호출하여 아키텍처 어휘(**모듈**, **인터페이스**, **깊이**, **경계선**, **어댑터**, **레버리지**, **응집성**) 및 원칙(삭제 테스트, "인터페이스가 곧 테스트 표면", "어댑터 1개 = 가상, 2개 = 진짜")을 활용하세요. 모든 제안에서 이 용어들을 엄격히 사용하고 "컴포넌트", "서비스", "API", "경계" 등으로 변형하지 마세요.
+- `GLOSSARY.md`의 도메인 언어는 좋은 경계선에 이름을 부여하며, `docs/adr/`의 ADR은 이 명령어가 불필요하게 재논의하지 말아야 할 결정 사항들을 기록합니다.
 
-## Process
+## 프로세스
 
-### 1. Explore
+### 1. 탐색
 
-**Scope before you scan: YAGNI.** Deepening a module pays off by making future changes to it easier, so put extra weight on the parts of the codebase that have recently changed. Decide *where* to look before you look:
+**스캔하기 전 범위 한정: YAGNI(필요한 것만 하라).** 모듈을 심화하는 것은 향후의 수정을 쉽게 만들어 가치를 환수하므로, 최근 자주 변경된 코드베이스 영역에 더 큰 가중치를 두세요. 탐색 전에 *어디*를 볼지 먼저 결정합니다:
 
-- If the user named a direction (a module, a subsystem, a pain point), take it, and skip the inference below.
-- Otherwise, walk back a good stretch of the commit history (`git log --oneline`) to find the codebase's hot spots, the files and areas that keep coming up, and let those paths pull your attention first. If the changes are scattered with no clear hot spot, widen the net.
+- 사용자가 특정 방향(특정 모듈, 하위 시스템, 고통 지점)을 지정했다면 그것을 따르고 아래의 추론은 건너뜁니다.
+- 그렇지 않다면 커밋 히스토리(`git log --oneline`)를 거슬러 올라가 코드베이스의 핫스팟(자주 등장하는 파일 및 영역)을 찾고, 그 경로들에 먼저 주목하세요.
 
-Read the project's domain glossary (`GLOSSARY.md`) and any ADRs in the area you're touching first.
+먼저 프로젝트의 도메인 용어집(`GLOSSARY.md`)과 작업 영역의 ADR을 읽으세요.
 
-Then spawn a sub-agent to walk the codebase. Don't follow rigid heuristics; explore organically and note where you experience friction:
+그런 다음 서브에이전트를 생성하여 코드베이스를 탐색합니다. 기계적인 규칙에 얽매이지 말고 유기적으로 탐색하며 마찰이 느껴지는 곳을 기록하세요:
+- 하나의 개념을 이해하기 위해 수많은 작은 모듈을 계속 오가야 하는 곳은 어디인가?
+- 인터페이스가 구현체만큼이나 복잡한 **얕은 모듈**은 어디인가?
+- 테스트 용이성만을 위해 순수 함수로 추출되었으나, 실제 버그는 호출 방식에 숨어있는 곳(**응집성 부족**)은 어디인가?
+- 강하게 결합된 모듈들이 경계선을 넘어 세부사항을 누출하는 곳은 어디인가?
+- 현재 인터페이스를 통해 테스트되지 않았거나 테스트하기 어려운 영역은 어디인가?
 
-- Where does understanding one concept require bouncing between many small modules?
-- Where are modules **shallow**, with an interface nearly as complex as the implementation?
-- Where have pure functions been extracted just for testability, but the real bugs hide in how they're called (no **locality**)?
-- Where do tightly-coupled modules leak across their seams?
-- Which parts of the codebase are untested, or hard to test through their current interface?
+얕다고 의심되는 대상에 **삭제 테스트**를 적용하세요: 이를 삭제했을 때 복잡성이 한곳에 응집되는가, 아니면 그냥 다른 곳으로 이동할 뿐인가? "응집된다"는 답이 바로 찾고자 하는 신호입니다.
 
-Apply the **deletion test** to anything you suspect is shallow: would deleting it concentrate complexity, or just move it? A "yes, concentrates" is the signal you want.
+### 2. 시각적 HTML 리포트로 후보 제시
 
-### 2. Present candidates as an HTML report
+저장소를 어지럽히지 않도록 OS 임시 디렉토리에 독립 실행형 HTML 파일을 작성합니다. `$TMPDIR` 또는 `/tmp`(Windows의 경우 `%TEMP%`) 경로를 확인하여 `<tmpdir>/architecture-review-<timestamp>.html`로 작성합니다. 파일을 사용자 화면에 열어주고(`open <path>` 또는 `xdg-open <path>`) 절대 경로를 안내합니다.
 
-Write a self-contained HTML file to the OS temp directory so nothing lands in the repo. Resolve the temp dir from `$TMPDIR`, falling back to `/tmp` (or `%TEMP%` on Windows), and write to `<tmpdir>/architecture-review-<timestamp>.html` so each run gets a fresh file. Open it for the user (`xdg-open <path>` on Linux, `open <path>` on macOS, `start <path>` on Windows) and tell them the absolute path.
+리포트는 **CDN의 Tailwind**와 **Mermaid**를 사용하여 구조와 흐름을 시각화합니다. 각 후보마다 **적용 전/적용 후 시각화 다이어그램**을 포함하세요.
 
-The report uses **Tailwind via CDN** for layout and styling, and **Mermaid via CDN** for diagrams where a graph/flow/sequence reliably communicates the structure. Mix Mermaid with hand-crafted CSS/SVG visuals: use Mermaid when relationships are graph-shaped (call graphs, dependencies, sequences), and hand-built divs/SVG when you want something more editorial (mass diagrams, cross-sections, collapse animations). Each candidate gets a **before/after visualisation**. Be visual.
+각 후보 카드에 포함할 내용:
+- **대상 파일 (Files)**: 관련된 파일 및 모듈 목록
+- **문제점 (Problem)**: 현재 아키텍처가 마찰을 일으키는 이유
+- **해결책 (Solution)**: 무엇을 변경할 것인지에 대한 명확한 설명
+- **혜택 (Benefits)**: 응집성과 레버리지 관점에서 설명하고, 테스트가 어떻게 개선되는지 제시
+- **전/후 다이어그램 (Before / After diagram)**: 얕은 구조와 심화된 구조를 나란히 대조
+- **추천 강도 (Recommendation strength)**: `Strong(강력 추천)`, `Worth exploring(탐색 가치 있음)`, `Speculative(추측적)` 배지
 
-For each candidate, render a card with:
+리포트 말미에 **최우선 추천(Top recommendation)** 섹션을 두고 어떤 후보부터 착수할지 그 이유를 기술합니다.
 
-- **Files**: which files/modules are involved
-- **Problem**: why the current architecture is causing friction
-- **Solution**: plain English description of what would change
-- **Benefits**: explained in terms of locality and leverage, and how tests would improve
-- **Before / After diagram**: side-by-side, custom-drawn, illustrating the shallowness and the deepening
-- **Recommendation strength**: one of `Strong`, `Worth exploring`, `Speculative`, rendered as a badge
+**도메인에는 GLOSSARY.md 어휘를, 아키텍처에는 /codebase-design 어휘를 사용하세요.** `GLOSSARY.md`에 "Order"가 정의되어 있다면 "FooBarHandler"나 "Order 서비스"가 아니라 "Order 접수 모듈"로 표현하세요.
 
-End the report with a **Top recommendation** section: which candidate you'd tackle first and why.
+전체 HTML 스캐폴드, 다이어그램 패턴, 스타일 가이드는 [HTML-REPORT.md](HTML-REPORT.md)를 참조하세요.
 
-**Use GLOSSARY.md vocabulary for the domain, and the `/codebase-design` vocabulary for the architecture.** If `GLOSSARY.md` defines "Order," talk about "the Order intake module," not "the FooBarHandler," and not "the Order service."
+아직 구체적인 인터페이스를 제안하지 마세요. 파일 작성이 끝나면 사용자에게 묻습니다: "이 후보들 중 어떤 것을 더 자세히 탐색해 보시겠습니까?"
 
-**ADR conflicts**: if a candidate contradicts an existing ADR, only surface it when the friction is real enough to warrant revisiting the ADR. Mark it clearly in the card (e.g. a warning callout: _"contradicts ADR-0007, but worth reopening because…"_). Don't list every theoretical refactor an ADR forbids.
+### 3. 심문(Grilling) 루프
 
-See [HTML-REPORT.md](HTML-REPORT.md) for the full HTML scaffold, diagram patterns, and styling guidance.
+사용자가 후보를 선택하면 Skill 도구를 "grilling"으로 호출하여 의사결정 트리를 함께 탐색합니다: 제약 조건, 의존성, 심화된 모듈의 형태, 경계선 뒤에 위치할 내용, 살아남을 테스트들.
 
-Do NOT propose interfaces yet. After the file is written, ask the user: "Which of these would you like to explore?"
+결정이 구체화됨에 따라 사이드 이펙트가 인라인으로 발생합니다. 진행 과정에서 도메인 모델을 최신으로 유지하기 위해 Skill 도구를 "domain-modeling"으로 호출하세요:
 
-### 3. Grilling loop
-
-Once the user picks a candidate, call the Skill tool with "grilling" to walk the decision tree with them: constraints, dependencies, the shape of the deepened module, what sits behind the seam, what tests survive.
-
-Side effects happen inline as decisions crystallize; call the Skill tool with "domain-modeling" to keep the domain model current as you go:
-
-- **Naming a deepened module after a concept not in `GLOSSARY.md`?** Add the term to `GLOSSARY.md`. Create the file lazily if it doesn't exist.
-- **Sharpening a fuzzy term during the conversation?** Update `GLOSSARY.md` right there.
-- **User rejects the candidate with a load-bearing reason?** Offer an ADR, framed as: _"Want me to record this as an ADR so future architecture reviews don't re-suggest it?"_ Only offer when the reason would actually be needed by a future explorer to avoid re-suggesting the same thing; skip ephemeral reasons ("not worth it right now") and self-evident ones.
-- **Want to explore alternative interfaces for the deepened module?** Call the Skill tool with "codebase-design" and use its design-it-twice parallel sub-agent pattern.
+- **심화된 모듈의 이름이 `GLOSSARY.md`에 없는 개념인가요?** `GLOSSARY.md`에 용어를 추가하세요. 파일이 없으면 지연 생성합니다.
+- **대화 도중 모호한 용어가 명확해졌나요?** 그 자리에서 즉시 `GLOSSARY.md`를 업데이트하세요.
+- **사용자가 핵심적인 이유로 후보를 기각했나요?** 다음과 같이 ADR 기록을 제안하세요: _"미래의 아키텍처 리뷰에서 이를 다시 제안하지 않도록 ADR로 기록해 둘까요?"_ 미래의 탐색자가 동일한 내용을 다시 제안하는 것을 피하기 위해 실제로 필요한 이유일 때만 제안하세요. 일시적인 이유("지금은 가치가 없음")나 자명한 이유는 건너뜁니다.
+- **심화된 모듈의 대안 인터페이스들을 탐색하고 싶나요?** Skill 도구를 "codebase-design"으로 호출하고 두 번 설계하기(Design it twice) 병렬 서브에이전트 패턴을 사용하세요.

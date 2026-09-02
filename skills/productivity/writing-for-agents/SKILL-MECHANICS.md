@@ -1,22 +1,14 @@
-# Skill mechanics
+# 스킬 메커니즘 (Skill Mechanics)
 
-The skill-specific branch of [`writing-for-agents`](SKILL.md): what changes when the document is a skill (frontmatter, the invocation choice, and router skills). Everything else about writing it is the universal reference in `SKILL.md`.
+문서가 스킬일 때 적용되는 프론트매터, 호출 방식 선택 및 라우터 스킬 지침입니다.
 
-## Invocation
+## 호출 방식 선택 (Invocation)
 
-Two choices, trading the two loads:
+두 가지 부하를 고려한 선택:
 
-- A **model-invoked** skill keeps a `description`, so the agent can fire it autonomously, and other skills can reach it. You can still type its name: model-invocation always _includes_ user reach; a description only ever adds agent discovery, never removes the human's. The description is the skill's top-level context pointer, forced to stay loaded at all times: permanent context load in exchange for discoverability. A model-invoked skill whose content is all reference is also one home for shared reference: another skill can invoke it, so reference needed by several skills lives in one place. Mechanics: omit `disable-model-invocation`, and write a model-facing description carrying the trigger branches (the pointer-writing rules in `SKILL.md` apply in full).
-- A **user-invoked** skill strips the description from the agent's reach: only the human typing its name can invoke it, and no other skill can. Zero context load, but it spends cognitive load: you are the index that must remember it exists. Mechanics: set `disable-model-invocation: true`; the `description` becomes human-facing: a one-line summary, trigger lists stripped.
+- **모델 호출 (Model-invoked)**: `description`을 유지하여 에이전트가 자율적으로 실행하거나 다른 스킬이 호출할 수 있도록 합니다. 사용자가 직접 이름을 입력해서 실행할 수도 있습니다. 항상 컨텍스트 창에 description이 로드되어 토큰을 소모하지만 자율 탐색이 가능해집니다. `disable-model-invocation` 설정을 생략합니다.
+- **사용자 호출 (User-invoked)**: 에이전트의 자율 호출 목록에서 description을 제외합니다. 오직 사용자가 직접 슬래시 커맨드로 입력할 때만 실행됩니다. 컨텍스트 부하는 0이지만, 사용자가 해당 스킬의 존재를 기억해야 하는 인지 부하가 발생합니다. `disable-model-invocation: true`를 설정합니다.
 
-Pick model-invocation only when the agent must reach the skill on its own, or another skill must. If it only ever fires by hand, make it user-invoked and pay no context load.
+## 라우터 스킬 (Router skills)
 
-Shared reference that two user-invoked skills both need can live in neither: with no descriptions, neither can fire the other. Push it to a plain file outside the skill system: external reference any skill can point at.
-
-## Splitting by invocation
-
-The invocation cut of splitting (the sequence cut lives in `SKILL.md`): split off a model-invoked skill when you have a distinct leading word that should trigger it on its own (a trigger word you actually use in your prompts), or another skill must reach it. You pay context load for the new always-loaded description, so that independent reach has to be worth it.
-
-## Router skills
-
-When user-invoked skills multiply past what you can remember, that piled-up cognitive load is cured by a **router skill**: one user-invoked skill that names the others and when to reach for each, so the human has one skill to remember instead of many. It can only hint, never fire them: user-invoked skills have no description, so nothing but the human can reach them.
+기억할 수 없을 만큼 사용자 호출 스킬이 많아졌을 때, 이를 해결하는 것이 바로 **라우터 스킬**(`ask-matt`)입니다: 다른 스킬들의 목록과 사용 시점을 안내하여, 사람이 수많은 스킬 대신 단 하나의 라우터 스킬만 기억하면 되도록 돕습니다.

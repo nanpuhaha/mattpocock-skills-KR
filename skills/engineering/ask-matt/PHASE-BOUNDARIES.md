@@ -1,55 +1,54 @@
-# Phase boundaries
+# 페이즈 경계 (Phase boundaries)
 
-A **phase** is a chunk of work inside a session: the grilling, the implementation, the QA. The definition is fuzzy on purpose: a phase ends when you think *"ok, we're done with that"*.
+**페이즈(Phase)** 란 한 세션 내에서의 작업 단위(심문, 구현, QA 등)를 말합니다. 그 정의는 의도적으로 유연합니다. *"좋아, 이 작업은 다 끝났어"* 라고 생각되는 순간 하나의 페이즈가 끝납니다.
 
-The **phase boundary** is the gap between two phases, and it is the only place this decision belongs. Mid-phase there is no decision to make: continue, or split the work that's left into subagents. Compacting mid-phase makes the agent lose the thread.
+**페이즈 경계(Phase boundary)** 는 두 페이즈 사이의 틈새이며, 컨텍스트 전환에 대한 결정은 오직 이 경계에서만 이루어져야 합니다. 페이즈 도중에는 선택할 것이 없습니다: 그대로 계속 진행하거나, 남은 작업을 서브에이전트로 쪼개는 것뿐입니다. 페이즈 중간에 컴팩트(/compact)를 실행하면 에이전트가 생각의 흐름을 잃어버립니다.
 
-## The five options
+## 5가지 선택지
 
-| Option       | What it does                                                    |
+| 옵션 | 하는 일 |
 | ------------ | --------------------------------------------------------------- |
-| **Continue** | Stay in the session. No context switch at all.                    |
-| **`/clear`** | Empty the context window and start from nothing.                  |
-| **`/handoff`** | Write a portable markdown file and seed a session anywhere with it. |
-| **Subagent** | Send the task to its own context window and get a report back.     |
-| **`/compact`** | Compress this context and seed a fresh session with the summary.  |
+| **Continue** | 현재 세션 유지. 컨텍스트 전환 전혀 없음. |
+| **`/clear`** | 컨텍스트 창을 비우고 완전히 처음부터 시작. |
+| **`/handoff`** | 이식 가능한 마크다운 파일을 작성하여 어디서나 세션을 시작할 수 있게 함. |
+| **Subagent** | 작업을 독립된 컨텍스트 창으로 보내고 완료 보고서만 받음. |
+| **`/compact`** | 현재 컨텍스트를 압축하고 요약본으로 새 세션을 시작. |
 
-## The tree
+## 의사결정 트리
 
-Work top to bottom at the boundary. The first **yes** wins.
+경계에서 위에서 아래 순서로 검토하세요. 가장 먼저 **Yes**가 나오는 옵션을 선택합니다.
 
-**1. Can you continue in this session?** Two things make the answer yes: the next phase needs this phase as a **primary source**, or you have enough [smart zone](https://www.aihero.dev/ai-coding-dictionary/smart-zone) left (~150k tokens) for the next phase to fit. Grilling → implementation is the standard yes: the implementation wants the reasoning verbatim, not a summary of it. Continue costs nothing and loses nothing, so rule it out before anything else.
+**1. 이 세션에서 그대로 계속(Continue)할 수 있는가?** 두 가지 조건이면 Yes입니다: 다음 페이즈가 이번 페이즈의 내용을 **1차 출처(Primary Source)** 로 직접 필요로 하거나, 다음 페이즈를 수용할 충분한 [스마트 존(Smart Zone)](https://www.aihero.dev/ai-coding-dictionary/smart-zone) 용량(~15만 토큰)이 남아있는 경우입니다. '심문 → 구현' 전환이 전형적인 Yes의 사례입니다. 구현 단계에서는 요약본이 아니라 심문 과정에서의 추론 내용을 날것 그대로 필요로 하기 때문입니다. Continue는 비용도 들지 않고 정보 손실도 없으므로, 다른 어떤 것보다 먼저 검토하세요.
 
-**2. Is the context irrelevant to what comes next?** Is everything in this session (the exploration, the decisions, the dead ends) disposable? If so, **`/clear`**. It is the cheapest move on the board: it takes no time and hands back the whole window. `/clear` also isn't terminal: the old session stays resumable.
+**2. 이전 컨텍스트가 다음 작업에 완전히 불필요한가?** 이번 세션의 모든 내용(탐색, 결정, 실패한 시도들)이 버려져도 괜찮다면 **`/clear`** 하세요. 가장 비용이 적게 드는 방법입니다: 시간이 전혀 들지 않으며 전체 컨텍스트 창을 깨끗이 돌려받습니다.
 
-The cost of getting this wrong is one-way. Clear a *relevant* context and you lose the **why** behind what you built, and no amount of reading the diff back gets it returned.
+이 판단을 잘못 내렸을 때의 피해는 일방적입니다. *필요한* 컨텍스트를 비워버리면 우리가 코드를 그렇게 작성한 **'이유(Why)'** 를 영원히 잃어버리게 되며, diff를 아무리 다시 읽어봐도 그 이유를 복원할 수 없습니다.
 
-**3. Do you need to hand off?** `/handoff` is narrow. You need it only when you are:
+**3. 인수인계(Handoff)가 필요한가?** `/handoff`의 사용 범위는 매우 좁습니다. 다음과 같은 경우에만 필요합니다:
+- **새로운 하네스**로 교체할 때 (Claude → Codex),
+- **새로운 디렉토리**나 저장소로 이동할 때,
+- 작업을 **동료**에게 넘길 때,
+- 또는 작업 도중 발견한 사이드 태스크를 현재 흐름을 방해하지 않고 **페이즈 중간에 분기**할 때.
 
-- swapping to a **new harness** (Claude → Codex),
-- moving to a **new directory** or repo,
-- sending the work to a **colleague**,
-- or forking a side task you found **mid-phase** without derailing what you're doing.
+이 목록이 전부입니다. `/handoff`의 핵심 가치는 **이식성(Portability)** 입니다. 다른 곳으로 전달할 필요가 없다면 사용할 이유가 없습니다.
 
-That list is the whole clause. What `/handoff` buys is **portability**: a file that travels. If nothing is travelling, you don't need it.
+**4. 자리를 비운 상태(AFK)에서 수행 가능한 작업인가?** 사람의 추가 개입 없이 자리를 비워도 될 만큼 작업 범위가 명확하게 한정되어 있다면, **서브에이전트(Subagent)** 로 보내고 현재 세션은 그대로 유지하세요. 자동화된 코드 리뷰가 대표적인 사례입니다. 에이전트가 diff를 읽고 보고서를 작성하는 동안 사용자가 대기할 필요가 없습니다.
 
-**4. Can the task be done AFK?** Is it scoped tightly enough to run with you away from the keyboard, no steering? Then send it to a **subagent** and leave this session untouched. Automated review is the standard case: the agent reads the diff and reports, and you aren't needed while it does.
+**5. 그 외의 모든 경우는 `/compact`.** 필요한 컨텍스트가 있고, 동일한 도구와 디렉토리이며, 사용자가 루프에 계속 참여해야 하는 경우: 트리는 결국 여기에 도달하게 되며, 실제로 매우 자주 도달합니다. 다음 페이즈에 필요한 내용을 요약본이 잘 간직할 수 있도록 지시어와 함께 실행하세요 (예: `/compact 이 부분 QA를 진행할 예정입니다`).
 
-**5. Otherwise, `/compact`.** Relevant context, same harness, same directory, and you need to stay in the loop: this is where the tree lands, and it lands here often. Pass it an instruction (`/compact we're going to QA this area`) so the summary keeps what the next phase needs.
+`/compact`는 **기본 선택지이지, 첫 번째로 손이 가야 할 도구가 아닙니다**. 위의 네 가지 질문이 모두 더 저렴하거나 정밀하기 때문에 맨 아래에 위치합니다. 무턱대고 compact부터 시작하면 요약 과정에서 뭉개진 결정 사항에 대해 에이전트가 자신 있게 엉뚱한 판단을 내리는 부작용이 발생합니다.
 
-`/compact` is the **default, not the first reach**. It sits at the bottom because the four questions above it are all cheaper or more precise. The failure mode when people start here is a fresh session that is confidently wrong about a decision the summary flattened.
+## 1차 출처와 2차 출처
 
-## Primary and secondary sources
+**Continue**를 제외한 모든 이동은 **1차 출처**를 **2차 출처**로 변환합니다. 즉, 실제로 일어났던 날것의 세션이 요약본으로 대체됩니다. 이러한 트레이드오프는 항상 동일합니다:
 
-Every move except **Continue** turns a **primary source** into a **secondary source**: the session as it happened, replaced by a summary of it. The trade is always the same shape:
-
-| Source                            | Information | Noise | Room to move |
+| 출처 | 정보량 | 노이즈 | 활동 여유 공간 |
 | --------------------------------- | ----------- | ----- | ------------ |
-| Primary (Continue)                | Full        | Lots  | Little       |
-| Secondary (`/compact`, `/handoff`) | Lossy       | Less  | Lots         |
+| 1차 출처 (Continue) | 완벽함 | 많음 | 적음 |
+| 2차 출처 (`/compact`, `/handoff`) | 손실 있음 | 적음 | 많음 |
 
-This is why question 1 comes first. You only pay the lossiness when staying costs more than it saves.
+이것이 질문 1이 맨 먼저 나오는 이유입니다. 현재 세션에 머무르는 비용이 떠나는 비용보다 클 때만 정보 손실을 감수해야 합니다.
 
-## These are judgement calls
+## 이것은 판단의 영역입니다
 
-The questions are not objective: each has taste in it, and the same boundary can go two ways on two days. The value is in asking them **in order**, at the boundary rather than in the middle of the work.
+이 질문들은 완전히 기계적인 것이 아닙니다. 상황에 따른 직관이 필요하며, 동일한 경계라도 날마다 다른 결정을 내릴 수 있습니다. 핵심 가치는 작업 중간이 아니라 페이즈 경계에서 **정해진 순서대로** 질문을 던지는 데 있습니다.

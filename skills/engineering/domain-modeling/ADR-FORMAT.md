@@ -1,47 +1,44 @@
-# ADR Format
+# ADR(아키텍처 결정 기록) 형식
 
-ADRs live in `docs/adr/` and use sequential numbering: `0001-slug.md`, `0002-slug.md`, etc.
+ADR은 `docs/adr/` 디렉토리에 위치하며 순차적인 번호를 사용합니다: `0001-slug.md`, `0002-slug.md` 등.
 
-Create the `docs/adr/` directory lazily: only when the first ADR is needed.
+`docs/adr/` 디렉토리는 첫 번째 ADR이 필요할 때 생성합니다.
 
-## Template
+## 기본 템플릿
 
 ```md
-# {Short title of the decision}
+# {결정 사항의 간결한 제목}
 
-{1-3 sentences: what's the context, what did we decide, and why.}
+{1~3개 문장: 어떤 맥락이었고, 무엇을 결정했으며, 그 이유는 무엇인가.}
 ```
 
-That's it. An ADR can be a single paragraph. The value is in recording *that* a decision was made and *why*, not in filling out sections.
+이것이 전부입니다. ADR은 단 한 문단으로도 충분합니다. 가치는 형식을 채우는 것이 아니라 *결정이 내려졌다는 사실*과 *그 이유*를 기록하는 데 있습니다.
 
-## Optional sections
+## 선택적 섹션
 
-Only include these when they add genuine value. Most ADRs won't need them.
+실질적인 가치를 더할 때만 포함하세요. 대부분의 ADR에는 필요하지 않습니다:
 
-- **Status** frontmatter (`proposed | accepted | deprecated | superseded by ADR-NNNN`): useful when decisions are revisited
-- **Considered Options**: only when the rejected alternatives are worth remembering
-- **Consequences**: only when non-obvious downstream effects need to be called out
+- **상태 (Status)** 메타데이터 (`proposed | accepted | deprecated | superseded by ADR-NNNN`): 결정을 재검토할 때 유용
+- **고려된 대안 (Considered Options)**: 기각된 대안들을 기억할 가치가 있을 때만
+- **결과 및 영향 (Consequences)**: 명확하지 않은 다운스트림 영향이 있을 때만
 
-## Numbering
+## 번호 매기기
 
-Scan `docs/adr/` for the highest existing number and increment by one.
+`docs/adr/` 내의 가장 높은 번호를 확인하고 1을 증가시켜 새 번호를 부여합니다.
 
-## When to offer an ADR
+## ADR 작성을 제안하는 기준
 
-All three of these must be true:
+다음 세 가지 조건이 **모두 참**이어야 합니다:
 
-1. **Hard to reverse**: the cost of changing your mind later is meaningful
-2. **Surprising without context**: a future reader will look at the code and wonder "why on earth did they do it this way?"
-3. **The result of a real trade-off**: there were genuine alternatives and you picked one for specific reasons
+1. **되돌리기 어려움(Hard to reverse)**: 나중에 결정을 번복할 때의 비용이 상당함
+2. **맥락 없이는 의아함(Surprising without context)**: 미래의 개발자가 코드를 보고 "도대체 왜 이렇게 작성했을까?"라고 의아해할 만함
+3. **진정한 트레이드오프의 결과**: 실질적인 대안들이 존재했고 구체적인 이유로 특정 대안을 선택함
 
-If a decision is easy to reverse, skip it: you'll just reverse it. If it's not surprising, nobody will wonder why. If there was no real alternative, there's nothing to record beyond "we did the obvious thing."
+### 작성 대상 예시
 
-### What qualifies
-
-- **Architectural shape.** "We're using a monorepo." "The write model is event-sourced, the read model is projected into Postgres."
-- **Integration patterns between contexts.** "Ordering and Billing communicate via domain events, not synchronous HTTP."
-- **Technology choices that carry lock-in.** Database, message bus, auth provider, deployment target. Not every library: just the ones that would take a quarter to swap out.
-- **Boundary and scope decisions.** "Customer data is owned by the Customer context; other contexts reference it by ID only." The explicit no-s are as valuable as the yes-s.
-- **Deliberate deviations from the obvious path.** "We're using manual SQL instead of an ORM because X." Anything where a reasonable reader would assume the opposite. These stop the next engineer from "fixing" something that was deliberate.
-- **Constraints not visible in the code.** "We can't use AWS because of compliance requirements." "Response times must be under 200ms because of the partner API contract."
-- **Rejected alternatives when the rejection is non-obvious.** If you considered GraphQL and picked REST for subtle reasons, record it; otherwise someone will suggest GraphQL again in six months.
+- **아키텍처 형태**: "모노레포를 사용한다", "쓰기 모델은 이벤트 소싱을 적용하고 읽기 모델은 Postgres로 프로젝션한다"
+- **컨텍스트 간 통합 패턴**: "주문과 결제는 동기식 HTTP가 아닌 도메인 이벤트를 통해 통신한다"
+- **종속성(Lock-in)이 수반되는 기술 선택**: 데이터베이스, 메시지 버스, 인증 제공자 등 교체에 몇 달이 걸리는 기술
+- **경계 및 범위 결정**: "고객 데이터는 Customer 컨텍스트가 소유하며, 다른 컨텍스트는 ID로만 참조한다"
+- **일반적인 경로로부터의 의도적 이탈**: "X 이유로 ORM 대신 직접 작성한 SQL을 사용한다" (누군가 '개선'하려다 의도적인 설계를 망가뜨리는 것 방지)
+- **코드에 보이지 않는 제약 조건**: "규제 준수 요구사항으로 인해 특정 클라우드를 사용할 수 없다"

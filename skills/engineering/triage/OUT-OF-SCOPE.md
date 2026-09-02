@@ -1,11 +1,11 @@
-# Out-of-Scope Knowledge Base
+# 범위 제외(Out-of-Scope) 지식 베이스
 
-The `.out-of-scope/` directory in a repo stores persistent records of rejected feature requests. It serves two purposes:
+저장소의 `.out-of-scope/` 디렉토리는 기각된 기능 요청의 영구적인 기록을 보관합니다. 두 가지 목적을 가집니다:
 
-1. **Institutional memory**: why a feature was rejected, so the reasoning isn't lost when the issue is closed
-2. **Deduplication**: when a new issue comes in that matches a prior rejection, the skill can surface the previous decision instead of re-litigating it
+1. **조직적 기억(Institutional memory)**: 이슈가 닫힌 후에도 기능이 기각된 이유를 보존합니다.
+2. **중복 검사(Deduplication)**: 과거 기각된 요청과 유사한 새 이슈가 들어왔을 때, 불필요한 재논의 없이 과거의 결정을 즉시 제시할 수 있습니다.
 
-## Directory structure
+## 디렉토리 구조
 
 ```
 .out-of-scope/
@@ -14,92 +14,28 @@ The `.out-of-scope/` directory in a repo stores persistent records of rejected f
 └── graphql-api.md
 ```
 
-One file per **concept**, not per issue. Multiple issues requesting the same thing are grouped under one file.
+이슈별이 아니라 **개념(Concept)** 별로 1개 파일을 작성합니다. 동일한 기능을 요청한 여러 이슈는 하나의 파일 아래에 묶입니다.
 
-## File format
-
-The file should be written in a relaxed, readable style, more like a short design document than a database entry. Use paragraphs, code samples, and examples to make the reasoning clear and useful to someone encountering it for the first time.
+## 파일 작성 형식
 
 ```markdown
-# Dark Mode
+# 다크 모드 (Dark Mode)
 
-This project does not support dark mode or user-facing theming.
+이 프로젝트는 다크 모드나 사용자 테마 커스텀을 지원하지 않습니다.
 
-## Why this is out of scope
+## 범위에서 제외된 이유 (Why this is out of scope)
 
-The rendering pipeline assumes a single color palette defined in
-`ThemeConfig`. Supporting multiple themes would require:
+렌더링 파이프라인은 `ThemeConfig`에 정의된 단일 컬러 팔레트를 전제로 합니다. 다중 테마를 지원하려면 컴포넌트 트리 전체에 테마 프로바이더를 래핑하고 영속성 계층을 추가해야 합니다.
+이는 콘텐츠 저작이라는 프로젝트의 핵심 집중 분야와 맞지 않습니다.
 
-- A theme context provider wrapping the entire component tree
-- Per-component theme-aware style resolution
-- A persistence layer for user theme preferences
+## 이전 요청 목록 (Prior requests)
 
-This is a significant architectural change that doesn't align with the
-project's focus on content authoring. Theming is a concern for downstream
-consumers who embed or redistribute the output.
-
-```ts
-// The current ThemeConfig interface is not designed for runtime switching:
-interface ThemeConfig {
-  colors: ColorPalette; // single palette, resolved at build time
-  fonts: FontStack;
-}
+- #42: "다크 모드 지원 추가"
+- #87: "접근성을 위한 야간 테마"
+- #134: "다크 테마 옵션"
 ```
 
-## Prior requests
+## 작성 및 확인 규칙
 
-- #42: "Add dark mode support"
-- #87: "Night theme for accessibility"
-- #134: "Dark theme option"
-```
-
-### Naming the file
-
-Use a short, descriptive kebab-case name for the concept: `dark-mode.md`, `plugin-system.md`, `graphql-api.md`. The name should be recognizable enough that someone browsing the directory understands what was rejected without opening the file.
-
-### Writing the reason
-
-The reason should be substantive: not "we don't want this" but why. Good reasons reference:
-
-- Project scope or philosophy ("This project focuses on X; theming is a downstream concern")
-- Technical constraints ("Supporting this would require Y, which conflicts with our Z architecture")
-- Strategic decisions ("We chose to use A instead of B because...")
-
-The reason should be durable. Avoid referencing temporary circumstances ("we're too busy right now"); those aren't real rejections, they're deferrals.
-
-## When to check `.out-of-scope/`
-
-During triage (Step 1: Gather context), read all files in `.out-of-scope/`. When evaluating a new issue:
-
-- Check if the request matches an existing out-of-scope concept
-- Matching is by concept similarity, not keyword: "night theme" matches `dark-mode.md`
-- If there's a match, surface it to the maintainer: "This is similar to `.out-of-scope/dark-mode.md`. We rejected this before because [reason]. Do you still feel the same way?"
-
-The maintainer may:
-
-- **Confirm**: the new issue gets added to the existing file's "Prior requests" list, then closed
-- **Reconsider**: the out-of-scope file gets deleted or updated, and the issue proceeds through normal triage
-- **Disagree**: the issues are related but distinct, proceed with normal triage
-
-## When to write to `.out-of-scope/`
-
-Only when an **enhancement** (not a bug) is *rejected* as `wontfix`. This applies to enhancement PRs exactly as it does to issues: a rejected PR is recorded here so the same request doesn't return as fresh code.
-
-Do **not** write here when something is closed as `wontfix` because it's **already implemented**. That's a built feature, not a rejected one; recording it would poison the dedup checks with false rejections. Instead, the closing comment points to where the feature already lives.
-
-The flow:
-
-1. Maintainer decides a feature request is out of scope
-2. Check if a matching `.out-of-scope/` file already exists
-3. If yes: append the new issue to the "Prior requests" list
-4. If no: create a new file with the concept name, decision, reason, and first prior request
-5. Post a comment on the issue explaining the decision and mentioning the `.out-of-scope/` file
-6. Close the issue with the `wontfix` label
-
-## Updating or removing out-of-scope files
-
-If the maintainer changes their mind about a previously rejected concept:
-
-- Delete the `.out-of-scope/` file
-- The skill does not need to reopen old issues; they're historical records
-- The new issue that triggered the reconsideration proceeds through normal triage
+- **확인 시점**: 이슈 분류 시 `.out-of-scope/` 내의 모든 파일을 읽어 유사한 기각 이력이 있는지 확인합니다.
+- **작성 시점**: **기능 개선(Enhancement)** 요청이 `wontfix`로 *기각*되었을 때만 작성합니다. (버그 리포트나 이미 구현되어 닫히는 경우는 제외)

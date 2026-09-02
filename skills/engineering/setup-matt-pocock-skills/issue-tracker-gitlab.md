@@ -1,46 +1,44 @@
-# Issue tracker: GitLab
+# 이슈 트래커: GitLab
 
-Issues and specs for this repo live as GitLab issues. Use the [`glab`](https://gitlab.com/gitlab-org/cli) CLI for all operations.
+이 저장소의 이슈와 스펙은 GitLab Issues로 관리됩니다. 모든 작업에 [`glab`](https://gitlab.com/gitlab-org/cli) CLI를 사용합니다.
 
-## Conventions
+## 사용 규약
 
-- **Create an issue**: `glab issue create --title "..." --description "..."`. Use a heredoc for multi-line descriptions. Pass `--description -` to open an editor.
-- **Read an issue**: `glab issue view <number> --comments`. Use `-F json` for machine-readable output.
-- **List issues**: `glab issue list -O json` with appropriate `--label` filters.
-- **Comment on an issue**: `glab issue note <number> --message "..."`. GitLab calls comments "notes".
-- **Apply / remove labels**: `glab issue update <number> --label "..."` / `--unlabel "..."`. Multiple labels can be comma-separated or by repeating the flag.
-- **Close**: `glab issue close <number>`. `glab issue close` does not accept a closing comment, so post the explanation first with `glab issue note <number> --message "..."`, then close.
-- **Merge requests**: GitLab calls PRs "merge requests". Use `glab mr create`, `glab mr view`, `glab mr note`, etc., the same shape as `gh pr ...` with `mr` in place of `pr` and `note`/`--message` in place of `comment`/`--body`.
+- **이슈 생성**: `glab issue create --title "..." --description "..."`. 여러 줄 설명은 heredoc을 사용하세요. 에디터를 열려면 `--description -`을 전달합니다.
+- **이슈 조회**: `glab issue view <number> --comments`. 기계 판독 가능한 출력에는 `-F json`을 사용합니다.
+- **이슈 목록 조회**: 적절한 `--label` 필터와 함께 `glab issue list -O json`.
+- **댓글 작성**: `glab issue note <number> --message "..."`. GitLab에서는 댓글을 'note'라고 부릅니다.
+- **라벨 추가/제거**: `glab issue update <number> --label "..."` / `--unlabel "..."`. 여러 라벨은 쉼표로 구분하거나 플래그를 반복 지정할 수 있습니다.
+- **이슈 닫기**: `glab issue close <number>`. `glab issue close`는 종료 댓글을 받지 않으므로, 먼저 `glab issue note <number> --message "..."`로 설명을 작성한 후 닫으세요.
+- **머지 리퀘스트 (MR)**: GitLab에서는 PR을 "merge requests"라고 부릅니다. `glab mr create`, `glab mr view`, `glab mr note` 등을 사용하며, `pr` 대신 `mr`, `comment`/`--body` 대신 `note`/`--message`를 쓰는 것 외에는 `gh pr ...`과 동일한 형태입니다.
 
-Infer the repo from `git remote -v`; `glab` does this automatically when run inside a clone.
+## 분류 대상으로서의 머지 리퀘스트 (MR)
 
-## Merge requests as a triage surface
+**MR을 요청 표면으로 취급: no.** _(외부 머지 리퀘스트를 기능 요청으로 취급하려면 `yes`로 설정하세요. `/triage` 스킬이 이 플래그를 읽습니다.)_
 
-**MRs as a request surface: no.** _(Set to `yes` if this repo treats external merge requests as feature requests; `/triage` reads this flag.)_
+`yes`로 설정된 경우 MR도 이슈와 동일한 라벨 및 상태를 거치며 해당하는 `glab mr` 명령어를 사용합니다:
 
-When set to `yes`, MRs run through the same labels and states as issues, using the `glab mr` equivalents:
+- **MR 조회**: `glab mr view <number> --comments` 및 diff 확인을 위한 `glab mr diff <number>`.
+- **분류를 위한 외부 MR 목록 조회**: `glab mr list -F json` 실행 후, 작성자가 프로젝트 멤버나 소유자가 아닌 MR만 유지합니다 (메인테이너의 진행 중인 작업이 아닌 기여자의 MR).
+- **댓글 / 라벨 / 닫기**: `glab mr note`, `glab mr update --label`/`--unlabel`, `glab mr close`.
 
-- **Read an MR**: `glab mr view <number> --comments` and `glab mr diff <number>` for the diff.
-- **List external MRs for triage**: `glab mr list -F json`, then keep only MRs whose author is not a project member/owner (a contributor's MR, not a maintainer's in-flight work).
-- **Comment / label / close**: `glab mr note`, `glab mr update --label`/`--unlabel`, `glab mr close`.
+GitHub와 달리 GitLab은 이슈와 MR에 별도로 번호를 매기므로 메인테이너가 어느 표면을 의미하는지 알면 `#42`는 모호하지 않습니다.
 
-Unlike GitHub, GitLab numbers issues and MRs separately, so `#42` is unambiguous once you know which surface the maintainer means.
+## 스킬에서 "이슈 트래커에 게시하라"고 할 때
 
-## When a skill says "publish to the issue tracker"
+GitLab 이슈를 생성합니다.
 
-Create a GitLab issue.
+## 스킬에서 "관련 티켓을 가져오라"고 할 때
 
-## When a skill says "fetch the relevant ticket"
+`glab issue view <number> --comments`를 실행합니다.
 
-Run `glab issue view <number> --comments`.
+## 웨이파인딩(Wayfinding) 작업 규약
 
-## Wayfinding operations
+`/wayfinder` 스킬에서 사용합니다. **맵(Map)** 은 단일 이슈이며, **하위(Child)** 이슈들이 개별 티켓이 됩니다.
 
-Used by `/wayfinder`. The **map** is a single issue with **child** issues as tickets.
-
-- **Map**: a single issue labelled `wayfinder:map`, holding the Notes / Decisions-so-far / Fog body. `glab issue create --label wayfinder:map`. (On GitLab tiers with native epics, an epic may hold the map instead; a labelled issue works everywhere.)
-- **Child ticket**: an issue carrying `Part of #<map>` at the top of its description and labels `wayfinder:<type>` (`research`/`prototype`/`grilling`/`task`). Once claimed, the ticket is assigned to the driving dev.
-- **Blocking**: GitLab's **native blocking link**, the canonical, UI-visible representation. Add it with the `/blocked_by #<n>` quick action, posted as a note (`glab issue note <child> --message "/blocked_by #<blocker>"`). Native blocking links are a Premium/Ultimate feature; on the free tier (or where unavailable) fall back to a `Blocked by: #<n>, #<n>` line at the top of the description. A ticket is unblocked when every blocker is closed.
-- **Frontier query**: `glab issue list -O json` scoped to the map's children, drop any with an open blocker: a native `blocked_by` link to an open issue (`glab api projects/:id/issues/<child-iid>/links`), or an open issue in the `Blocked by` line, or an assignee; first in map order wins.
-- **Claim**: `glab issue update <n> --assignee @me`, the session's first write.
-- **Resolve**: `glab issue note <n> --message "<answer>"`, then `glab issue close <n>`, then append a context pointer (gist + link) to the map's Decisions-so-far.
+- **맵(Map)**: `wayfinder:map` 라벨이 붙은 단일 이슈 (`glab issue create --label wayfinder:map`). 메모, 현재까지의 결정 사항, 안개(Fog) 본문을 담습니다. (네이티브 에픽을 지원하는 GitLab 플랜에서는 에픽이 대신 맵을 담을 수 있지만, 라벨이 지정된 이슈는 모든 환경에서 동작합니다.)
+- **자식 티켓 (Child ticket)**: 설명 상단에 `Part of #<map>`이 명시되고 `wayfinder:<type>` (`research`/`prototype`/`grilling`/`task`) 라벨이 붙은 이슈. 할당받으면 주도하는 개발자에게 할당됩니다.
+- **블로킹 (Blocking)**: GitLab의 **네이티브 블로킹 링크**, 표준적이고 UI에 표시되는 형태입니다. note로 게시되는 `/blocked_by #<n>` 퀵 액션으로 추가합니다 (`glab issue note <child> --message "/blocked_by #<blocker>"`). 네이티브 블로킹 링크는 Premium/Ultimate 기능입니다. 무료 티어(또는 미지원 환경)에서는 설명 상단의 `Blocked by: #<n>, #<n>` 줄로 대체합니다. 모든 블로커가 닫히면 티켓의 차단이 해제됩니다.
+- **프론티어 쿼리 (Frontier query)**: 맵의 자식 이슈로 범위를 좁혀 `glab issue list -O json`을 실행하고, 열린 블로커(열린 이슈에 대한 네이티브 `blocked_by` 링크: `glab api projects/:id/issues/<child-iid>/links`, 또는 `Blocked by` 줄의 열린 이슈)가 있거나 담당자가 있는 항목은 제외합니다. 맵 순서상 첫 번째 항목이 우선합니다.
+- **할당 (Claim)**: `glab issue update <n> --assignee @me`, 세션의 첫 번째 쓰기 작업입니다.
+- **해결 (Resolve)**: `glab issue note <n> --message "<답변>"`, 그 다음 `glab issue close <n>`, 그 다음 맵의 현재까지의 결정 사항에 컨텍스트 포인터(요약 + 링크)를 추가합니다.

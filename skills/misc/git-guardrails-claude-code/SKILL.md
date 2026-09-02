@@ -1,95 +1,24 @@
 ---
 name: git-guardrails-claude-code
-description: Set up Claude Code hooks to block dangerous git commands (push, reset --hard, clean, branch -D, etc.) before they execute. Use when user wants to prevent destructive git operations, add git safety hooks, or block git push/reset in Claude Code.
+description: 위험한 Git 명령어(push, reset --hard, clean, branch -D 등) 실행을 사전에 차단하는 Claude Code 훅을 설정합니다.
 ---
 
-# Setup Git Guardrails
+# Git 안전 가드레일 설정 (Setup Git Guardrails)
 
-Sets up a PreToolUse hook that intercepts and blocks dangerous git commands before Claude executes them.
+Claude가 위험한 Git 명령어를 실행하기 전에 이를 가로채서 차단하는 PreToolUse 훅을 설정합니다.
 
-## What Gets Blocked
+## 차단 대상 명령어
 
-- `git push` (all variants including `--force`)
+- `git push` (`--force` 포함 전체)
 - `git reset --hard`
 - `git clean -f` / `git clean -fd`
 - `git branch -D`
 - `git checkout .` / `git restore .`
 
-When blocked, Claude sees a message telling it that it does not have authority to access these commands.
+## 단계
 
-## Steps
-
-### 1. Ask scope
-
-Ask the user: install for **this project only** (`.claude/settings.json`) or **all projects** (`~/.claude/settings.json`)?
-
-### 2. Copy the hook script
-
-The bundled script is at: [scripts/block-dangerous-git.sh](scripts/block-dangerous-git.sh)
-
-Copy it to the target location based on scope:
-
-- **Project**: `.claude/hooks/block-dangerous-git.sh`
-- **Global**: `~/.claude/hooks/block-dangerous-git.sh`
-
-Make it executable with `chmod +x`.
-
-### 3. Add hook to settings
-
-Add to the appropriate settings file:
-
-**Project** (`.claude/settings.json`):
-
-```json
-{
-  "hooks": {
-    "PreToolUse": [
-      {
-        "matcher": "Bash",
-        "hooks": [
-          {
-            "type": "command",
-            "command": "\"$CLAUDE_PROJECT_DIR\"/.claude/hooks/block-dangerous-git.sh"
-          }
-        ]
-      }
-    ]
-  }
-}
-```
-
-**Global** (`~/.claude/settings.json`):
-
-```json
-{
-  "hooks": {
-    "PreToolUse": [
-      {
-        "matcher": "Bash",
-        "hooks": [
-          {
-            "type": "command",
-            "command": "~/.claude/hooks/block-dangerous-git.sh"
-          }
-        ]
-      }
-    ]
-  }
-}
-```
-
-If the settings file already exists, merge the hook into the existing `hooks.PreToolUse` array. Don't overwrite other settings.
-
-### 4. Ask about customization
-
-Ask if user wants to add or remove any patterns from the blocked list. Edit the copied script accordingly.
-
-### 5. Verify
-
-Run a quick test:
-
-```bash
-echo '{"tool_input":{"command":"git push origin main"}}' | <path-to-script>
-```
-
-Should exit with code 2 and print a BLOCKED message to stderr.
+1. **적용 범위 질문**: 현재 프로젝트 전용(`.claude/settings.json`) vs 전체 프로젝트 전역(`~/.claude/settings.json`)
+2. **스크립트 복사**: 대상 위치로 `scripts/block-dangerous-git.sh` 복사 후 `chmod +x`
+3. **설정에 훅 등록**: `.claude/settings.json`에 `PreToolUse` 훅 추가
+4. **커스텀 여부 확인**: 추가로 차단하거나 허용할 패턴 수정
+5. **검증**: 테스트 명령어로 차단(Exit code 2 및 BLOCKED 메시지) 확인

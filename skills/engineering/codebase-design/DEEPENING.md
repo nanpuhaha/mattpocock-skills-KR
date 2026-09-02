@@ -1,37 +1,37 @@
-# Deepening
+# 모듈 심화 기법 (Deepening)
 
-How to deepen a cluster of shallow modules safely, given its dependencies. Assumes the vocabulary in [SKILL.md](SKILL.md): **module**, **interface**, **seam**, **adapter**.
+의존성 관계를 고려하여 얕은 모듈 덩어리를 안전하게 깊은 모듈로 개선하는 방법입니다. [SKILL.md](SKILL.md)의 핵심 어휘(**모듈**, **인터페이스**, **경계선**, **어댑터**)를 기반으로 합니다.
 
-## Dependency categories
+## 의존성 분류 (Dependency categories)
 
-When assessing a candidate for deepening, classify its dependencies. The category determines how the deepened module is tested across its seam.
+심화할 대상을 평가할 때 의존성을 다음 네 가지로 분류하세요. 이 분류가 심화된 모듈이 경계선을 넘어 어떻게 테스트될지를 결정합니다.
 
-### 1. In-process
+### 1. 프로세스 내부 (In-process)
 
-Pure computation, in-memory state, no I/O. Always deepenable: merge the modules and test through the new interface directly. No adapter needed.
+순수 계산, 인메모리 상태, I/O 없음. 언제나 심화 가능: 모듈들을 하나로 병합하고 새 인터페이스를 통해 직접 테스트합니다. 별도 어댑터가 필요하지 않습니다.
 
-### 2. Local-substitutable
+### 2. 로컬 대체 가능 (Local-substitutable)
 
-Dependencies that have local test stand-ins (PGLite for Postgres, in-memory filesystem). Deepenable if the stand-in exists. The deepened module is tested with the stand-in running in the test suite. The seam is internal; no port at the module's external interface.
+로컬 테스트용 대역(Postgres용 PGLite, 인메모리 파일시스템 등)이 존재하는 의존성. 대역이 있다면 심화 가능합니다. 테스트 슈트에서 해당 대역을 실행하여 심화된 모듈을 테스트합니다. 경계선은 모듈 내부로 숨겨지며 외부에 포트를 노출하지 않습니다.
 
-### 3. Remote but owned (Ports & Adapters)
+### 3. 원격이지만 소유권이 있는 서비스 (Ports & Adapters)
 
-Your own services across a network boundary (microservices, internal APIs). Define a **port** (interface) at the seam. The deep module owns the logic; the transport is injected as an **adapter**. Tests use an in-memory adapter. Production uses an HTTP/gRPC/queue adapter.
+네트워크 경계 너머에 있는 사내 서비스(마이크로서비스, 내부 API 등). 경계선에 **포트(인터페이스)** 를 정의합니다. 심화된 모듈이 비즈니스 로직을 소유하고 전송 계층은 **어댑터**로 주입받습니다. 테스트는 인메모리 어댑터를 사용하고, 프로덕션은 HTTP/gRPC/큐 어댑터를 사용합니다.
 
-Recommendation shape: *"Define a port at the seam, implement an HTTP adapter for production and an in-memory adapter for testing, so the logic sits in one deep module even though it's deployed across a network."*
+권장 형태: *"경계선에 포트를 정의하고, 프로덕션용 HTTP 어댑터와 테스트용 인메모리 어댑터를 구현하여 네트워크로 배포되더라도 로직이 하나의 깊은 모듈에 응집되도록 구성합니다."*
 
-### 4. True external (Mock)
+### 4. 순수 외부 서드파티 서비스 (True external / Mock)
 
-Third-party services (Stripe, Twilio, etc.) you don't control. The deepened module takes the external dependency as an injected port; tests provide a mock adapter.
+통제할 수 없는 외부 서드파티 서비스(Stripe, Twilio 등). 심화된 모듈은 외부 의존성을 주입된 포트로 받고, 테스트는 목(Mock) 어댑터를 제공합니다.
 
-## Seam discipline
+## 경계선 규율 (Seam discipline)
 
-- **One adapter means a hypothetical seam. Two adapters means a real one.** Don't introduce a port unless at least two adapters are justified (typically production + test). A single-adapter seam is just indirection.
-- **Internal seams vs external seams.** A deep module can have internal seams (private to its implementation, used by its own tests) as well as the external seam at its interface. Don't expose internal seams through the interface just because tests use them.
+- **어댑터가 1개면 가상의 경계선, 2개면 진짜 경계선입니다.** 적어도 두 개의 어댑터(일반적으로 프로덕션용 + 테스트용)가 정당화되지 않는다면 포트를 도입하지 마세요. 단일 어댑터 경계선은 불필요한 간접 참조일 뿐입니다.
+- **내부 경계선 vs 외부 경계선.** 깊은 모듈은 인터페이스의 외부 경계선 외에도 자체 테스트가 사용하는 내부 경계선(구현 전용 비공개)을 가질 수 있습니다. 테스트가 사용한다는 이유만으로 내부 경계선을 외부 인터페이스에 노출하지 마세요.
 
-## Testing strategy: replace, don't layer
+## 테스트 전략: 계층 추가가 아닌 교체 (Replace, don't layer)
 
-- Old unit tests on shallow modules become waste once tests at the deepened module's interface exist; delete them.
-- Write new tests at the deepened module's interface. The **interface is the test surface**.
-- Tests assert on observable outcomes through the interface, not internal state.
-- Tests should survive internal refactors, since they describe behaviour, not implementation. If a test has to change when the implementation changes, it's testing past the interface.
+- 심화된 모듈의 인터페이스 테스트가 갖춰지면, 이전 얕은 모듈들의 유닛 테스트는 쓸모없어집니다. 과감히 삭제하세요.
+- 심화된 모듈의 인터페이스를 대상으로 새 테스트를 작성하세요. **인터페이스가 곧 테스트 표면입니다.**
+- 테스트는 내부 상태가 아니라 인터페이스를 통해 관찰 가능한 결과만을 단언(Assert)해야 합니다.
+- 테스트는 내부 리팩터링 후에도 그대로 통과해야 합니다. 구현이 바뀔 때마다 테스트가 깨진다면 인터페이스를 넘어 내부를 테스트하고 있는 것입니다.

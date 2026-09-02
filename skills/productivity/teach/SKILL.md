@@ -1,140 +1,137 @@
 ---
 name: teach
-description: Teach the user a new skill or concept, within this workspace.
+description: 이 작업 공간 내에서 사용자에게 새로운 스킬이나 개념을 가르칩니다.
 disable-model-invocation: true
-argument-hint: "What would you like to learn about?"
+argument-hint: "어떤 주제에 대해 배우고 싶으신가요?"
 ---
 
-The user has asked you to teach them something. This is a stateful request - they intend to learn the topic over multiple sessions.
+사용자가 새로운 스킬이나 개념을 가르쳐 달라고 요청했습니다. 이는 여러 세션에 걸쳐 학습을 진행하는 상태 유지형 요청입니다.
 
-## Teaching Workspace
+## 학습 작업 공간 (Teaching Workspace)
 
-Treat the current directory as a teaching workspace. Workspace paths (`./lessons/` and the rest) resolve from the directory `/teach` was run in; only the `*-FORMAT.md` links resolve from this skill's folder. The state of their learning is captured in this directory in several files:
+현재 디렉토리를 학습 작업 공간으로 취급합니다. 작업 공간 경로(`./lessons/` 등)는 `/teach`가 실행된 디렉토리를 기준으로 처리되며, `*-FORMAT.md` 링크만 이 스킬 폴더를 기준으로 처리됩니다. 학습 상태는 이 디렉토리 내 여러 파일로 관리됩니다:
 
-- `MISSION.md`: A document capturing the _reason_ the user is interested in the topic. This should be used to ground all teaching. Use the format in [MISSION-FORMAT.md](./MISSION-FORMAT.md).
-- `./reference/*.html`: A directory of reference materials. These are the compressed learnings from the lessons - cheat sheets, reference algorithms, syntax, yoga poses, glossaries. They are the raw units of learning. They should be beautiful documents which print out well, and are designed for quick reference.
-- `RESOURCES.md`: A list of resources which can be explored to ground your teaching in contextual knowledge, or to acquire knowledge and wisdom. Use the format in [RESOURCES-FORMAT.md](./RESOURCES-FORMAT.md).
-- `./learning-records/*.md`: A directory of learning records, which capture what the user has learned. These are loosely equivalent to architectural decision records in software development - they capture non-obvious lessons and key insights that may need to be revised later, or drive future sessions. These should be used to calculate the zone of proximal development. They are titled `0001-<dash-case-name>.md`, where the number increments each time. Use the format in [LEARNING-RECORD-FORMAT.md](./LEARNING-RECORD-FORMAT.md).
-- `./lessons/*.html`: A directory of lessons. A **lesson** is a single, self-contained HTML output that teaches one tightly-scoped thing tied to the mission. This is the primary unit of teaching in this workspace.
-- `./assets/*`: Reusable **components** shared across lessons. See [Assets](#assets).
-- `NOTES.md`: A scratchpad for you to jot down user preferences, or working notes.
+- `MISSION.md`: 사용자가 이 주제에 관심을 가지게 된 *목적(이유)* 을 담은 문서 ([MISSION-FORMAT.md](./MISSION-FORMAT.md) 형식).
+- `./reference/*.html`: 참조 자료 디렉토리 (치트시트, 핵심 알고리즘, 문법 요약, 용어집 등 빠르게 찾아볼 수 있는 깔끔한 문서).
+- `RESOURCES.md`: 신뢰할 수 있는 외부 출처 목록 ([RESOURCES-FORMAT.md](./RESOURCES-FORMAT.md) 형식).
+- `./learning-records/*.md`: 사용자가 배운 핵심 인사이트를 기록하는 학습 기록 (`0001-<이름>.md` 형식, [LEARNING-RECORD-FORMAT.md](./LEARNING-RECORD-FORMAT.md) 참고).
+- `./lessons/*.html`: 개별 레슨 파일들 (`0001-<이름>.html`).
+- `./assets/*`: 레슨 간에 재사용되는 공통 컴포넌트(스타일시트, 퀴즈 위젯, 시뮬레이터 등).
+- `NOTES.md`: 사용자의 학습 선호도 메모장.
 
-## Philosophy
+## 교육 철학 (Pedagogical Philosophy)
 
-To learn at a deep level, the user needs three things:
+깊이 있는 학습을 위해 3가지가 필요합니다:
+- **지식(Knowledge)**: 신뢰할 수 있는 1차 출처로부터 습득
+- **스킬(Skills)**: 대화형 피드백 루프 레슨을 통해 훈련
+- **지혜(Wisdom)**: 실제 커뮤니티 및 실무자와의 상호작용을 통해 체득
 
-- **Knowledge**, captured from high-quality, high-trust resources
-- **Skills**, acquired through highly-relevant interactive lessons devised by you, based on the knowledge
-- **Wisdom**, which comes from interacting with other learners and practitioners
+어떤 주제는 지식보다 스킬이 더 많이 필요할 수 있습니다. 이론 물리학을 배우는 것은 지식 중심일 수 있지만, 요가는 스킬 중심일 것입니다.
 
-Before the `RESOURCES.md` is well-populated, your focus should be to find high-quality resources which will help the user acquire knowledge. Never trust your parametric knowledge.
+### 유창성(Fluency) vs 저장 강도(Storage Strength)
 
-Some topics may require more skills than knowledge. Learning more about theoretical physics might be more knowledge-based. For yoga, more skills-based.
+두 가지 학습 유형을 주의 깊게 구분해야 합니다:
 
-### Fluency vs Storage Strength
+- **유창성 강도(Fluency strength)**: 그 순간 지식을 인출하는 능력
+- **저장 강도(Storage strength)**: 지식의 장기적인 기억 보존력
 
-You should be careful to split between two types of learning:
+유창성은 사용자에게 숙달했다는 착각을 줄 수 있지만, 진정한 목표는 저장 강도입니다. 바람직한 어려움(desirable difficulty)을 통해 장기적인 기억 보존을 형성하는 레슨을 설계하세요:
 
-- **Fluency strength**: in-the-moment retrieval of knowledge
-- **Storage strength**: long-term retention of knowledge
+- 인출 연습(기억으로부터 회상) 활용
+- 간격 두기(시간을 두고 연습 분산)
+- 교차 연습(연습 시 서로 다르지만 관련된 주제 섞기, 스킬 연습에만 적용)
 
-Fluency can give the user an illusory sense of mastery, but storage strength is the real goal. Try to design lessons which build long-term retention by desirable difficulty:
+## 레슨 (Lessons)
 
-- Using retrieval practice (recall from memory)
-- Spacing (distributing practice over time)
-- Interleaving (mixing up different but related topics in practice - for skills practice only)
+레슨은 당신이 제작하는 핵심 결과물입니다. 지식과 스킬이 사용자에게 도달하는 단위입니다. 각 레슨은 하나의 독립 실행형 HTML 파일이며, `./lessons/`에 `0001-<케밥케이스-이름>.html` 형식으로 저장되고 번호는 매번 1씩 증가합니다.
 
-## Lessons
+레슨은 사용자가 나중에 복습하러 돌아올 것이므로 터프티(Tufte) 스타일을 염두에 두고 깔끔하고 가독성 좋은 타이포그래피와 레이아웃으로 **아름답게** 만들어져야 합니다.
 
-A lesson is the main thing you produce: the unit in which knowledge and skills reach the user. Each lesson is one self-contained HTML file, saved to `./lessons/` and titled `0001-<dash-case-name>.html` where the number increments each time.
+레슨은 짧아야 하며, 매우 빠르게 완료할 수 있어야 합니다. 학습자의 작업 기억 용량은 매우 작으므로 그 범위 내에 머물러야 합니다. 하지만 각 레슨은 사용자가 이를 토대로 발전할 수 있는 구체적인 단 하나의 성공 경험을 제공해야 합니다. 미션과 직접 연결되어야 하고 사용자의 근접 발달 영역(ZPD)에 있어야 합니다.
 
-A lesson should be **beautiful**, with clean, readable typography and layout, since the user will return to these later to review. Think Tufte.
+가능하다면 CLI 명령어를 실행하여 사용자를 위해 레슨 파일을 직접 열어주세요.
 
-The lesson should be short, and completable very quickly. Learners' working memory is very small, and we need to stay within it. But each lesson should give the user a single tangible win that they can build on. It should be directly tied to the mission, and should be in the user's zone of proximal development.
+각 레슨은 HTML 앵커 링크를 통해 다른 레슨 및 참조 문서와 연결되어야 합니다.
 
-If possible, open the lesson file for the user by running a CLI command.
+각 레슨은 사용자가 읽거나 시청할 수 있는 1차 출처 자료를 추천해야 합니다. 이는 해당 주제에 대해 발견한 가장 질 높고 신뢰할 수 있는 자료여야 합니다.
 
-Each lesson should link via HTML anchors to other lessons and reference documents.
+각 레슨에는 에이전트에게 후속 질문을 하라는 안내를 포함해야 합니다. 에이전트는 사용자의 교사이며 명확하지 않은 모든 것에 대해 도움을 줄 수 있습니다.
 
-Each lesson should recommend a primary source for the user to read or watch. This should be the most high-quality, high-trust resource you found on the topic.
+## 에셋 (Assets)
 
-Each lesson should contain a reminder to ask followup questions to the agent. The agent is their teacher, and can assist with anything that's unclear.
+레슨은 `./assets/`에 저장되는 재사용 가능한 **컴포넌트**로 구성됩니다: 스타일시트, 퀴즈 위젯, 시뮬레이터, 다이어그램 도우미, 기타 후속 레슨에서 재사용할 수 있는 모든 요소입니다.
 
-## Assets
+재사용은 예외가 아니라 기본 원칙입니다. 레슨을 작성하기 전에 `./assets/`를 확인하고 이미 존재하는 컴포넌트를 기반으로 구성하세요. 레슨에 재사용 가능한 새로운 요소가 필요하다면 `./assets/`에 컴포넌트로 작성하고 링크하세요. 미래의 레슨이 중복할 코드를 절대로 인라인으로 작성하지 마세요.
 
-Lessons are built from reusable **components**, stored in `./assets/`: stylesheets, quiz widgets, simulators, diagram helpers, and anything else a second lesson could reuse.
+공유 스타일시트는 모든 작업 공간이 가장 먼저 확보해야 할 컴포넌트입니다. 모든 레슨이 이를 링크하여 일회성 파일들의 모음이 아닌 일관된 단일 코스처럼 보이도록 합니다. 작업 공간이 성장함에 따라 컴포넌트 라이브러리도 함께 확장되어야 합니다.
 
-Reuse is the default, not the exception. Before authoring a lesson, read `./assets/` and build from the components already there. When a lesson needs something new and reusable, write it as a component in `./assets/` and link to it; never inline code a future lesson would duplicate.
+## 미션 (The Mission)
 
-A shared stylesheet is the first component every workspace earns: every lesson links it, so the lessons look like one consistent course rather than a pile of one-offs. As the workspace grows, so should the component library.
+모든 레슨은 미션, 즉 사용자가 이 주제를 배우고 싶어 하는 이유와 연결되어야 합니다.
 
-## The Mission
+사용자의 미션이 불분명하거나 `MISSION.md`가 채워져 있지 않다면, 가장 먼저 사용자가 왜 이것을 배우고 싶어 하는지 질문해야 합니다.
 
-Every lesson should be tied into the mission - the reason that the user is interested in learning about the topic.
+미션을 이해하지 못하면 지식 습득이 실제 목표에 뿌리를 두지 못하게 됩니다. 레슨이 너무 추상적으로 느껴지며, 사용자가 다음에 무엇을 해야 할지 판단할 방법이 없어집니다.
 
-If the user is unclear about the mission, or the `MISSION.md` is not populated, your first job should be to question the user on why they want to learn this.
+사용자의 스킬과 지식이 발전함에 따라 미션이 바뀔 수 있습니다. 이는 자연스러운 현상입니다. 반드시 `MISSION.md`를 업데이트하고 변경 사항을 기록하는 학습 기록을 추가하세요. 미션을 변경하기 전에 사용자에게 확인을 받으세요.
 
-Failing to understand the mission will mean knowledge acquisition is not grounded in real-world goals. Lessons will feel too abstract. You will have no way of judging what the user should do next.
+## 근접 발달 영역 (Zone Of Proximal Development)
 
-Missions may change as the user develops more skills and knowledge. This is normal - make sure to update the `MISSION.md` and add a learning record to capture the change. Confirm with the user before changing the mission.
+매 레슨마다 사용자는 '딱 적당할 만큼' 도전받고 있다고 느껴야 합니다.
 
-## Zone Of Proximal Development
+사용자가 배우고 싶은 정확한 내용을 지정할 수도 있습니다. 그렇지 않다면 다음 방법으로 사용자의 근접 발달 영역을 파악하세요:
 
-Each lesson, the user should always feel as if they are being challenged 'just enough'.
+- `learning-records` 읽기
+- 미션을 기반으로 가르칠 적절한 내용 찾기
+- 근접 발달 영역에 부합하는 가장 관련성 높은 내용 가르치기
 
-The user may specify an exact thing they want to learn. If they don't, figure out their zone of proximal development by:
+## 지식 (Knowledge)
 
-- Reading their `learning-records`
-- Figuring out the right thing to teach them based on their mission
-- Teach the most relevant thing that fits in their zone of proximal development
+레슨은 사용자가 습득할 스킬을 중심으로 설계되어야 합니다. 레슨 내 지식은 해당 스킬을 습득하는 데 필요한 내용만 담아야 합니다. 지식을 먼저 가르친 다음, 대화형 피드백 루프를 통해 사용자가 스킬을 연습하도록 만드세요.
 
-## Knowledge
+지식은 먼저 신뢰할 수 있는 자료에서 수집해야 합니다. `RESOURCES.md`를 사용하여 이를 추적하세요. 레슨은 외부 자료로의 링크인 출처 인용으로 가득 차야 하며, 이를 통해 제시된 주장을 뒷받침해야 합니다. 이는 레슨의 신뢰성을 높여줍니다.
 
-Lessons should be designed around a skill the user is going to learn. The knowledge in the lesson should be only what's required to acquire that skill. You teach the knowledge first, then get the user to practice the skills via an interactive feedback loop.
+지식을 습득할 때 어려움은 적입니다. 이해에 필요한 작업 기억을 갉아먹기 때문입니다.
 
-Knowledge should first be gathered from trusted resources. Use `RESOURCES.md` to keep track of them. Lessons should be littered with citations - links to external resources to back up any claim made. This increases the trustworthiness of the lesson.
+## 스킬 (Skills)
 
-For acquiring knowledge, difficulty is the enemy. It eats working memory you need for understanding.
+지식이 습득에 관한 것이라면, 스킬은 지속성과 유연성에 관한 것입니다. 지식이 머릿속에 착 달라붙게 만드세요.
 
-## Skills
+스킬 습득에서 어려움은 유용한 도구입니다. 노력이 들어가는 인출 과정이 바로 저장 강도를 만듭니다. 스킬은 대화형 레슨을 통해 가르쳐야 합니다. 사용할 수 있는 도구는 다음과 같습니다:
 
-If knowledge is all about acquisition, skills are about durability and flexibility. Make the knowledge stick.
+- 퀴즈 및 가벼운 브라우저 내 작업을 활용한 대화형 레슨
+- 실제 수행할 단계 목록을 안내하는 레슨(예: 요가 자세)
 
-For skill acquisition, difficulty is the tool. Effortful retrieval is what builds storage strength. Skills should be taught through interactive lessons. There are several tools at your disposal:
+이 모든 것은 수행에 대한 피드백을 받는 **피드백 루프**를 기반으로 해야 합니다. 이 피드백 루프는 가능한 한 즉각적이어야 하며, 이상적으로는 자동이어야 합니다.
 
-- Interactive lessons, using quizzes and light in-browser tasks
-- Lessons which guide the user through a list of real-world steps to take (for instance, yoga poses)
+퀴즈의 경우, 각 선택지는 단어 수(가능하면 글자 수까지)가 완전히 동일해야 합니다. 질문마다 정답이 위치하는 순서를 다양하게 바꾸세요. 서식이나 순서를 통해 사용자에게 정답에 대한 힌트를 주지 마세요.
 
-Each of these should be based on a **feedback loop**, where the user receives feedback on their performance. This feedback loop should be as tight as possible, giving feedback immediately - and ideally automatically.
+## 지혜 습득 (Acquiring Wisdom)
 
-For quizzes, each answer should be exactly the same number of words (and characters, if possible). Vary which position holds the correct answer across questions. Don't give the user any clues about the answer through formatting or order.
+지혜는 학습 환경 밖에서 스킬을 시험해보는 진정한 현실 세계와의 상호작용에서 나옵니다.
 
-## Acquiring Wisdom
+사용자가 지혜가 필요한 질문을 할 때, 기본 태도는 답변을 시도하되 궁극적으로는 **커뮤니티**로 위임하는 것입니다.
 
-Wisdom comes from true real-world interaction - testing your skills outside the learning environment.
+커뮤니티는 사용자가 현실 세계에서 스킬을 시험해 볼 수 있는 온/오프라인 공간입니다. 포럼, 서브레딧, 실제 오프라인 강의(예산이 허락하는 경우), 지역 소모임 등이 될 수 있습니다.
 
-When the user asks a question that appears to require wisdom, your default posture should be to attempt to answer - but to ultimately delegate to a **community**.
+사용자가 참여할 수 있는 평판 좋은 커뮤니티를 찾아보세요. 사용자가 커뮤니티에 참여하고 싶지 않다는 의사를 밝히면 이를 존중하세요.
 
-A community is a place (online or offline) where the user can test their skills in the real world. This might be a forum, a subreddit, a real-world class (budget permitting) or a local interest group.
+## 참조 문서 (Reference Documents)
 
-You should attempt to find high-reputation communities the user can join. If the user expresses a preference that they don't want to join a community, respect it.
+레슨을 만드는 동안 참조 문서도 함께 작성해야 합니다. 레슨은 이러한 문서를 참조할 수 있으며, 레슨 전반에 걸쳐 유용한 원천 지식 단위를 추적하는 데 유용합니다.
 
-## Reference Documents
+레슨 자체는 나중에 다시 읽는 일이 드물겠지만, 참조 문서는 자주 다시 찾게 됩니다. 빠른 참조를 위해 고안된 형식으로 레슨의 핵심만을 압축해 담아야 합니다.
 
-While creating lessons, you should also create reference documents. Lessons can reference these documents - they are useful for tracking raw units of knowledge useful across lessons.
+참조 문서로 만들기에 적합한 학습 주제는 다음과 같습니다:
 
-Lessons will rarely be revisited later - reference documents will be. They should be the compressed essence of the lesson, in a format designed for quick reference.
+- 프로그래밍의 문법 및 코드 스니펫
+- 프로세스를 위한 알고리즘 및 순서도
+- 요가를 위한 요가 자세 및 시퀀스
+- 피트니스를 위한 운동 및 루틴
+- 고유한 전문 용어가 있는 주제를 위한 용어집
 
-Some learning topics lend themselves to reference:
-
-- Syntax and code snippets for programming
-- Algorithms and flowcharts for processes
-- Yoga poses and sequences for yoga
-- Exercises and routines for fitness
-- Glossaries for any topic with its own nomenclature
-
-Glossaries, in particular, are an essential reference. Once one is created, it should be adhered to in every lesson.
+특히 용어집은 필수적인 참조 자료입니다. 한 번 작성되면 모든 레슨에서 이를 준수해야 합니다.
 
 ## `NOTES.md`
 
-The user will sometimes express preferences of how they want to be taught, or things you should keep in mind. This is the place to record those preferences, so you can refer back to them when designing lessons or working with the user.
+사용자는 자신이 어떻게 배우고 싶은지에 대한 선호도나 주의해야 할 사항을 언급할 때가 있습니다. 레슨을 설계하거나 사용자와 작업할 때 다시 참조할 수 있도록 이러한 선호도를 기록하는 장소입니다.

@@ -1,64 +1,46 @@
-# UI Prototype
+# UI 프로토타입 (UI Prototype)
 
-Generate **several radically different UI variations** on a single route, switchable from a floating bottom bar. The user flips between variants in the browser, picks one (or steals bits from each), then throws the rest away.
+단일 라우트 상에서 플로팅 하단 바를 통해 전환할 수 있는 **여러 개의 근본적으로 다른 UI 변형**을 생성합니다. 사용자는 브라우저에서 변형들을 넘겨보며 하나를 선택(또는 각 변형의 장점들을 조합)한 뒤 나머지를 정리합니다.
 
-If the question is about logic/state rather than what something looks like, this is the wrong branch. Use [LOGIC.md](LOGIC.md).
+(외형이 아니라 로직/상태에 대한 질문이라면 [LOGIC.md](LOGIC.md)를 사용하세요.)
 
-## When this is the right shape
+## 적합한 상황
 
-- "What should this page look like?"
-- "I want to see a few options for this dashboard before committing."
-- "Try a different layout for the settings screen."
-- Any time the user would otherwise spend a day picking between three vague mockups in their head.
+- "이 페이지가 어떻게 보여야 할까요?"
+- "확정하기 전에 이 대시보드의 몇 가지 옵션을 눈으로 보고 싶습니다."
+- "설정 화면의 레이아웃을 다르게 시도해 봅시다."
+- 머릿속으로 모호한 세 가지 목업을 상상하느라 하루를 낭비하기 쉬운 모든 경우.
 
-## Two sub-shapes: strongly prefer sub-shape A
+## 두 가지 형태: 서브 형태 A를 적극 권장
 
-A UI prototype is much easier to judge when it's **butting up against the rest of the app**: real header, real sidebar, real data, real density. A throwaway route on its own is a vacuum: every variant looks fine in isolation. Default to sub-shape A whenever there's a plausible existing page to host the variants. Only reach for sub-shape B if the prototype genuinely has no nearby home.
+UI 프로토타입은 **실제 앱의 다른 부분(실제 헤더, 실제 사이드바, 실제 데이터, 실제 밀도)과 맞닿아 있을 때** 훨씬 정확하게 판단할 수 있습니다. 완전히 격리된 1회용 라우트는 진공 상태와 같아서 모든 변형이 괜찮아 보이는 착시를 일으킵니다.
 
-### Sub-shape A: adjustment to an existing page (preferred)
+### 서브 형태 A: 기존 페이지 수정 (강력 권장)
+라우트가 이미 존재합니다. 변형들은 **동일한 라우트** 상에서 `?variant=` URL 쿼리 파라미터로 제어되어 렌더링됩니다. 기존 데이터 패칭, 파라미터, 인증은 그대로 유지되고 렌더링 서브트리만 교체됩니다.
 
-The route already exists. Variants are rendered **on the same route**, gated by a `?variant=` URL search param. The existing data fetching, params, and auth all stay. Only the rendering swaps. This is the default; pick it unless there's a specific reason not to.
+새로운 섹션이나 컴포넌트라도 자연스럽게 호스트 페이지 안에 들어갈 수 있다면 서브 형태 A에 해당합니다.
 
-If the prototype is for something that doesn't yet have a page but *would naturally live inside one* (a new section of the dashboard, a new card on the settings screen, a new step in an existing flow), it's still sub-shape A. Mount the variants inside the host page.
+### 서브 형태 B: 신규 독립 페이지 (최후의 수단)
+프로토타이핑 대상이 기존 페이지 내에 들어갈 자리가 전혀 없는 완전히 새로운 독립 표면일 때만 사용합니다. 프로젝트 컨벤션에 따라 `/prototype/<이름>` 같은 1회용 라우트를 생성합니다.
 
-### Sub-shape B: a new page (last resort)
+## 프로세스
 
-Only use this when the thing being prototyped genuinely has no existing page to live inside (e.g. an entirely new top-level surface, or a flow that can't be embedded anywhere sensible).
+### 1. 질문 정의 및 변형 개수(N) 결정
+기본적으로 **3개의 변형**을 권장합니다 (5개 초과는 노이즈가 됩니다).
+한 줄로 계획을 명시하세요:
+> "기존 `/settings` 라우트에서 `?variant=`로 전환 가능한 3가지 설정 페이지 변형."
 
-Create a **throwaway route** following whatever routing convention the project already uses. Don't invent a new top-level structure. Name it so it's obviously a prototype (e.g. include the word `prototype` in the path or filename). Same `?variant=` pattern.
+### 2. 근본적으로 다른 변형 생성
+각 변형을 작성합니다:
+- 페이지의 목적과 접근 가능한 실제 데이터 준수
+- 프로젝트의 컴포넌트 라이브러리 및 스타일링 시스템 준수
+- 명확한 컴포넌트 이름 (`VariantA`, `VariantB`, `VariantC`)
 
-Before committing to sub-shape B, sanity-check: is there really no existing page this could be embedded in? An empty route hides design problems that a populated one would expose.
+변형들은 단순히 색상만 다른 것이 아니라 **구조적으로 완전히 달라야 합니다** (다른 레이아웃, 다른 정보 위계, 다른 주요 조작 요소).
 
-In both sub-shapes the floating bottom bar is identical.
-
-## Process
-
-### 1. State the question and pick N
-
-Default to **3 variants**. More than 5 stops being radically different and starts being noise, so cap there.
-
-Write down the plan in one line, in the prototype's location or a top-of-file comment:
-
-> "Three variants of the settings page, switchable via `?variant=`, on the existing `/settings` route."
-
-This works whether the user is here to push back or not.
-
-### 2. Generate radically different variants
-
-Draft each variant. Hold each one to:
-
-- The page's purpose and the data it has access to.
-- The project's component library / styling system (TailwindCSS, shadcn, MUI, plain CSS, whatever).
-- A clear exported component name, e.g. `VariantA`, `VariantB`, `VariantC`.
-
-Variants must be **structurally different**: different layout, different information hierarchy, different primary affordance, not just different colours. Three slightly-tweaked card grids isn't a UI prototype, it's wallpaper. If two drafts come out too similar, redo one with explicit "do not use a card grid" guidance.
-
-### 3. Wire them together
-
-Create a single switcher component on the route:
+### 3. 스위처로 연결
 
 ```tsx
-// pseudo-code, adapt to the project's framework
 const variant = searchParams.get('variant') ?? 'A';
 return (
   <>
@@ -70,43 +52,21 @@ return (
 );
 ```
 
-For sub-shape A (existing page): keep all the existing data fetching above the switcher; only the rendered subtree changes per variant.
+### 4. 플로팅 스위처 구축
+화면 하단 중앙에 고정된 작은 바:
+- **좌측 화살표**: 이전 변형으로 순환
+- **변형 라벨**: 현재 변형 키 및 이름 (예: `B (사이드바 레이아웃)`)
+- **우측 화살표**: 다음 변형으로 순환
+- 키보드 `←`, `→` 단축키 지원 (입력 폼 포커스 시에는 단축키 비활성화)
+- 프로덕션 빌드에서는 비노출 (`process.env.NODE_ENV !== 'production'`)
 
-For sub-shape B (new page): the throwaway route under `/prototype/<name>` mounts the same switcher.
+### 5. 피드백 및 최종 정리
+URL을 전달하면 사용자가 변형들을 비교해 보고 **"B의 헤더와 C의 사이드바를 결합하고 싶다"** 와 같은 구체적인 피드백을 제시합니다.
+최종 확정된 변형을 실제 프로덕션 코드로 통합하고, 나머지 변형들은 `prototype/<이름>` 브랜치에 1차 출처로 남겨둔 뒤 메인 브랜치에서 스위처를 제거합니다.
 
-### 4. Build the floating switcher
+## 피해야 할 패턴
 
-A small fixed-position bar at the bottom-centre of the screen with three pieces:
-
-- **Left arrow**: cycles to the previous variant (wraps around).
-- **Variant label**: shows the current variant key and, if the variant exports a name, that name too. e.g. `B (Sidebar layout)`.
-- **Right arrow**: cycles forward (wraps around).
-
-Behaviour:
-
-- Clicking an arrow updates the URL search param (use the framework's router, e.g. `router.replace` on Next, `navigate` on React Router, etc) so the variant is shareable and reload-stable.
-- Keyboard: `←` and `→` arrow keys also cycle. Don't intercept arrow keys when an `<input>`, `<textarea>`, or `[contenteditable]` is focused.
-- Visually distinct from the page (e.g. high-contrast pill, subtle shadow) so it's obviously not part of the design being evaluated.
-- Hidden in production builds: gate on `process.env.NODE_ENV !== 'production'` or an equivalent check, so a stray prototype merge can't ship the bar to users.
-
-Put the switcher in a single shared component so both sub-shapes can reuse it. Locate it wherever shared UI lives in the project.
-
-### 5. Hand it over
-
-Surface the URL (and the `?variant=` keys). The user will flip through whenever they get to it. The interesting feedback is usually **"I want the header from B with the sidebar from C"**, which is the actual design they want.
-
-### 6. Capture the answer and clean up
-
-Once a variant has won, capture the answer (which variant and why), then capture the prototype the way the [SKILL](SKILL.md) describes. Fold the winner into the real code and move the rest onto the throwaway branch, not into main:
-
-- **Sub-shape A**: fold the winner into the existing page; drop the losing variants and the switcher from main.
-- **Sub-shape B**: promote the winning variant to a real route; drop the throwaway route and the switcher from main.
-
-The full set of variants is the primary source, so it lands on the throwaway branch, not the bin, since variant components and the switcher left in the main branch rot fast and confuse the next reader.
-
-## Anti-patterns
-
-- **Variants that differ only in colour or copy.** That's a tweak, not a prototype. Real variants disagree about structure.
-- **Sharing too much code between variants.** A shared `<Header>` is fine; a shared `<Layout>` defeats the point. Each variant should be free to throw out the layout.
-- **Wiring variants to real mutations.** Read-only prototypes are fine. If a variant needs to mutate, point it at a stub: the question is "what should this look like", not "does the backend work".
-- **Promoting the prototype directly to production.** The variant code was written under prototype constraints (no tests, minimal error handling). Rewrite it properly when you fold it in.
+- **색상이나 텍스트 문구만 다른 변형.** (이것은 프로토타입이 아니라 단순 수정입니다.)
+- **변형 간에 레이아웃 코드까지 과도하게 공유.** (각 변형은 레이아웃을 자유롭게 바꿀 수 있어야 합니다.)
+- **실제 백엔드 뮤테이션 연결.** (읽기 전용 또는 스텁 사용 권장.)
+- **프로토타입 코드를 정제 없이 프로덕션에 그대로 직행 배포.** (확정 후 테스트와 적절한 에러 처리를 갖춰 정식 구현해야 합니다.)

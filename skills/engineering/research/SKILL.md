@@ -1,12 +1,12 @@
 ---
 name: research
-description: Investigate a question against high-trust primary sources and capture the findings as a Markdown file in the repo. Use when the user wants a topic researched, docs or API facts gathered, or reading legwork delegated to a background agent.
+description: 신뢰할 수 있는 1차 출처를 조사하여 출처가 명시된 마크다운 보고서로 작성합니다. 특정 주제를 조사하거나, 공식 문서/API 스펙을 수집하거나, 자료 조사를 백그라운드 에이전트에 위임하고자 할 때 사용합니다.
 ---
 
-Spin up a **background agent** to do the research, so you keep working while it reads.
+조사를 수행할 **백그라운드 에이전트**를 실행하여, 자료를 읽고 조사하는 동안 사용자는 다른 작업을 계속할 수 있도록 합니다.
 
-Its job:
+수행 작업:
 
-1. Investigate the question against **primary sources** (official docs, source code, specs, first-party APIs), not a secondary write-up of them. Follow every claim back to the source that owns it.
-2. Write the findings to a single Markdown file, citing each claim's source.
-3. Save it where the repo already keeps such notes; match the existing convention, and if there is none, put it somewhere sensible and say where.
+1. 2차 가공물이 아닌 **1차 출처**(공식 문서, 원본 소스 코드, 기술 스펙, 공식 API 등)를 바탕으로 질문을 조사합니다. 모든 주장의 근거를 원본 출처까지 역추적하여 검증합니다.
+2. 각 주장의 출처를 명시하여 단일 마크다운 파일로 조사 결과를 작성합니다.
+3. 저장소의 기존 메모/조사 문서 저장 규칙에 맞춰 저장합니다. 기존 컨벤션이 없다면 가장 적절한 위치에 저장하고 경로를 안내합니다.

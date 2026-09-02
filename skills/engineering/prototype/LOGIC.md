@@ -1,67 +1,59 @@
-# Logic Prototype
+# 로직 프로토타입 (Logic Prototype)
 
-A single, self-contained HTML file (a **shareable demo**) that lets anyone drive a state model by clicking buttons. Use this when the question is about **business logic, state transitions, or data shape**: the kind of thing that looks reasonable on paper but only feels wrong once you push it through real cases.
+누구나 버튼을 클릭하며 상태 모델을 조작해 볼 수 있는 단일 독립형 HTML 파일(**공유 가능한 데모**)입니다. **비즈니스 로직, 상태 전이 또는 데이터 구조**에 대한 의문(서류상으로는 그럴듯해 보이지만 실제 사례를 통과시켜 봐야 비로소 어색함이 느껴지는 것들)이 있을 때 사용합니다.
 
-Because it's one file with nothing to install, you can hand it to a non-developer (a designer, a PM, a domain expert) and let them feel the model for themselves. So it speaks their language, not the code's.
+설치할 것이 없는 단일 파일이므로 비개발자(디자이너, 기획자, 도메인 전문가)에게 전달하여 직접 모델을 체험하게 할 수 있습니다. 따라서 코드가 아닌 사용자의 도메인 언어로 소통해야 합니다.
 
-## When this is the right shape
+## 적합한 상황
 
-- "I'm not sure if this state machine handles the edge case where X then Y."
-- "Does this data model actually let me represent the case where..."
-- "I want to feel out what the API should look like before writing it."
-- Anything where someone wants to **press buttons and watch state change**.
+- "이 상태 머신이 X 발생 후 Y가 일어나는 엣지 케이스를 제대로 처리하는지 확신이 안 서요."
+- "이 데이터 모델이 실제로 이런 경우를 표현할 수 있나요?"
+- "API를 실제로 작성하기 전에 인터페이스 느낌을 먼저 보고 싶습니다."
+- **버튼을 누르고 상태가 변하는 모습을 직접 확인**하고 싶은 모든 경우.
 
-If the question is "what should this look like," this is the wrong branch. Use [UI.md](UI.md).
+(UI가 어떻게 보여야 하는가의 문제라면 [UI.md](UI.md)를 사용하세요.)
 
-## Process
+## 프로세스
 
-### 1. State the question
+### 1. 질문 정의
 
-Before writing code, write down what state model and what question you're prototyping. One paragraph, at the top of the demo (in a visible intro, not just a comment). A logic prototype that answers the wrong question is pure waste, so make the question explicit so it can be checked later, whether the user is watching now or returning to it AFK.
+코드를 작성하기 전에 어떤 상태 모델과 질문을 프로토타이핑하는지 데모 상단에 명시하세요. 잘못된 질문에 답하는 프로토타입은 낭비이므로, 질문을 명확히 정의합니다.
 
-### 2. Isolate the logic in a portable module
+### 2. 순수 모듈로 로직 격리
 
-Put the actual logic (the bit that's answering the question) in a single `<script>` block written as a small, pure module that could be lifted out and dropped into the real codebase later. The page around it is throwaway; this module isn't.
+질문에 답하는 핵심 로직을 단일 `<script>` 블록 내에 순수 모듈로 작성하여 나중에 실제 코드베이스로 그대로 옮겨갈 수 있도록 만듭니다. 주변의 HTML 페이지는 버려지지만, 이 로직 모듈은 유지됩니다.
 
-The right shape depends on the question:
+질문에 맞는 형태를 선택하세요:
+- **순수 리듀서**: `(state, action) => state` (이산적인 이벤트와 단일 상태값)
+- **상태 머신**: 명시적 상태와 전이 (현재 시점에 어떤 동작이 유효한지가 질문일 때)
+- **순수 함수 세트**: 평문 데이터 타입에 대한 변환 함수들
+- **클래스 또는 모듈**: 로직이 내부 상태를 직접 소유할 때
 
-- **A pure reducer**: `(state, action) => state`. Good when actions are discrete events and state is a single value.
-- **A state machine**: explicit states and transitions. Good when "which actions are even legal right now" is part of the question.
-- **A small set of pure functions** over a plain data type. Good when there's no implicit current state, just transformations.
-- **A class or module with a clear method surface** when the logic genuinely owns ongoing internal state.
+DOM이나 버튼 핸들러가 순수 로직 내부로 침투하지 않도록 철저히 분리하세요.
 
-Pick whichever shape best fits the question being asked, *not* whichever is easiest to wire to a page. Keep it pure: no DOM, no `document`, no button handlers reaching inside it. The page calls into it; nothing flows the other direction. This is what makes the prototype useful past its own lifetime: once the question's answered, the validated reducer / machine / function set lifts into the real module on its own.
+### 3. 공유 가능한 HTML 파일 구축
 
-### 3. Build the shareable HTML file
+단일 파일, 순수 HTML/CSS/JS (프레임워크, 번들러, 서버 없음). 더블 클릭으로 열리고 이메일로 전달해도 실행될 수 있어야 합니다.
 
-One file, plain HTML/CSS/JS: no framework, no bundler, no server, everything inline so it opens by double-click and survives being emailed around. Anyone should be able to run it by opening it.
+비개발자를 위해 작성하세요. 모든 라벨은 코드가 아닌 **도메인 언어**로 표현합니다:
+1. **제목 및 한 줄 설명**: 이 데모가 탐색하는 핵심 질문
+2. **현재 상태 패널**: 읽기 쉬운 형태로 렌더링된 전체 상태 (날것의 JSON 덤프가 아닌 라벨링된 필드)
+3. **자유 조작 버튼 (Free-play buttons)**: 언제든 누를 수 있는 액션별 버튼들
+4. **안내 시나리오 (Guided walkthroughs)**: 탭별로 구성된 시나리오 목록 (시나리오 설명과 순서대로 눌러야 할 단계별 버튼)
 
-Write it for a non-developer. Every label is in **domain language**, not code: buttons and state read like the business, not the reducer. Explain in plain words what's happening.
+### 4. 전달 및 피드백
 
-Lay it out with a clean hierarchy, top to bottom:
+사용자에게 파일을 열어주거나 전달합니다. 시나리오와 자유 조작을 눌러보며 "어, 이건 불가능해야 하는데?" 또는 "어라, 내가 생각했던 것과 다르게 동작하네"라는 반응이 나오는 순간이 바로 아이디어의 버그를 찾아낸 핵심 순간입니다.
 
-1. **Title and one-line explanation** of what this demo lets you explore (the question from step 1).
-2. **Current state**: the full relevant state, rendered as a readable panel (labelled fields, not a raw JSON dump), re-rendered after every click so the change is visible. Where it helps a non-developer follow, call out what just changed.
-3. **Free-play buttons**: one button per action, always available, so anyone can poke at the model in any order. Each click dispatches its action and re-renders the state.
-4. **Guided walkthroughs**: a set of **scenarios**, one per tab. Each tab holds a short plain-language description of the scenario (the situation it sets up and what to watch for) and underneath it, the ordered **buttons to press** for that scenario. Each step is a real button: clicking it performs that action and moves to the next step. Starting a walkthrough resets to a known initial state so the scenario runs the same way every time.
+### 5. 결과 기록 및 프로토타입 보존
 
-Choose scenarios that demonstrate the awkward cases, the ones hard to reason about on paper: the happy path, a tricky edge case, an attempt at something that should be illegal.
+질문에 답이 얻어지면 검증된 순수 로직은 실제 모듈로 승격시키고, HTML 쉘과 프로토타입은 `prototype/<이름>` 브랜치에 커밋하여 1차 출처로 보존합니다.
 
-Keep it beautiful but restrained: clean typography, generous spacing, one accent colour. No animations, no gimmicks: nothing that competes with the state and the buttons.
+## 피해야 할 패턴 (Anti-patterns)
 
-### 4. Hand it over
-
-Send them the file, or open it for them. They'll click through the walkthroughs and free-play whenever they get to it; the interesting moments are when they say "wait, that shouldn't be possible" or "huh, I assumed X would be different"; those are the bugs in the _idea_, which is the whole point. If they want new actions or a new scenario, add them. Prototypes evolve.
-
-### 5. Capture the answer and the prototype
-
-Once the prototype has answered its question, capture the answer, then capture the prototype the way the [SKILL](SKILL.md) describes. The logic-specific mapping: the validated reducer / machine / function set lifts into the real module (the decision, absorbed); the HTML shell rides along to the throwaway branch that keeps the prototype as a primary source, and being one self-contained file, it stays trivially re-runnable there.
-
-## Anti-patterns
-
-- **Don't add tests.** A prototype that needs tests is no longer a prototype.
-- **Don't wire it to the real database.** Use in-memory state unless the question is specifically about persistence.
-- **Don't generalise.** No "what if we wanted to support X later." The prototype answers one question.
-- **Don't blur the logic and the page together.** If the pure module references the DOM, `document`, or button handlers, it's no longer liftable. Keep the page as a thin shell over a pure module.
-- **Don't reach for a framework, bundler, or server.** One file the recipient double-clicks; a React app or a dev server defeats "shareable".
-- **Don't ship the HTML shell into production.** The page is optimised for being clicked through by hand. The logic module behind it is the bit worth keeping.
+- **테스트 코드를 추가하지 마세요.** 테스트가 필요한 프로토타입은 더 이상 프로토타입이 아닙니다.
+- **실제 데이터베이스에 연결하지 마세요.** 영속성 자체가 질문이 아닌 한 인메모리 상태를 사용하세요.
+- **일반화하지 마세요.** "나중에 X도 지원하려면..." 같은 고려는 배제합니다.
+- **로직과 UI를 섞지 마세요.** 순수 모듈이 DOM이나 `document`를 참조해서는 안 됩니다.
+- **프레임워크, 번들러, 서버를 끌어들이지 마세요.**
+- **HTML 쉘 자체를 프로덕션에 배포하지 마세요.**

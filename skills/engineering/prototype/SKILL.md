@@ -1,26 +1,26 @@
 ---
 name: prototype
-description: Build a throwaway prototype to answer a design question. Use when the user wants to sanity-check whether a state model or logic feels right, or explore what a UI should look like.
+description: 설계 의문에 답하기 위한 1회용 프로토타입을 제작합니다. 상태 모델이나 비즈니스 로직이 올바른지 점검하거나, UI가 어떻게 보여야 하는지 탐색하고자 할 때 사용합니다.
 ---
 
-# Prototype
+# 프로토타입 (Prototype)
 
-A prototype is **throwaway code that answers a question**. The question decides the shape.
+프로토타입은 **의문에 답하기 위한 1회용 코드**입니다. 해결하고자 하는 질문이 프로토타입의 형태를 결정합니다.
 
-## Pick a branch
+## 분기 선택
 
-Identify which question is being answered, using the user's prompt, the surrounding code, or by asking if the user is around:
+사용자의 프롬프트나 주변 코드 맥락을 확인하여 어떤 질문에 답해야 하는지 식별하세요:
 
-- **"Does this logic / state model feel right?"** → [LOGIC.md](LOGIC.md). Build a single shareable HTML file (free-play buttons plus tabbed guided walkthroughs) that pushes the state machine through cases that are hard to reason about on paper, and that a non-developer can drive.
-- **"What should this look like?"** → [UI.md](UI.md). Generate several radically different UI variations on a single route, switchable via a URL search param and a floating bottom bar.
+- **"이 로직 / 상태 모델이 올바른가?"** → [LOGIC.md](LOGIC.md). 자유 조작 버튼과 탭 기반 안내 시나리오를 갖춘 단일 독립형 HTML 파일을 생성하여, 서류상으로 검증하기 어려운 케이스를 비개발자도 직접 조작하며 확인할 수 있도록 합니다.
+- **"이 UI가 어떻게 보여야 하는가?"** → [UI.md](UI.md). 단일 라우트 상에서 URL 쿼리 파라미터와 플로팅 하단 바로 전환 가능한 여러 개의 근본적으로 다른 UI 변형들을 생성합니다.
 
-The two branches produce very different artifacts, so getting this wrong wastes the whole prototype. If the question is genuinely ambiguous and the user isn't reachable, default to whichever branch better matches the surrounding code (a backend module → logic; a page or component → UI) and state the assumption at the top of the prototype.
+두 분기는 전혀 다른 결과물을 생성하므로, 분기를 잘못 선택하면 프로토타입 전체가 무용지물이 됩니다.
 
-## Rules that apply to both
+## 공통 적용 규칙
 
-1. **Throwaway from day one, and clearly marked as such.** Locate the prototype code close to where it will actually be used (next to the module or page it's prototyping for) so context is obvious, but name it so a casual reader can see it's a prototype, not production. For throwaway UI routes, obey whatever routing convention the project already uses; don't invent a new top-level structure.
-2. **Trivial to run.** A UI prototype starts from one command in the project's task runner: `pnpm <name>`, `python <path>`, `bun <path>`, etc. A logic demo is a single HTML file the user double-clicks. Either way, no thinking required to start it.
-3. **No persistence by default.** State lives in memory. Persistence is the thing the prototype is _checking_, not something it should depend on. If the question explicitly involves a database, hit a scratch DB or a local file with a clear "PROTOTYPE, wipe me" name.
-4. **Skip the polish.** No tests, no error handling beyond what makes the prototype _runnable_, no abstractions. The point is to learn something fast.
-5. **Surface the state.** After every action (logic) or on every variant switch (UI), print or render the full relevant state so the user can see what changed.
-6. **Capture it when done.** Fold any validated decision into the real code, then capture the prototype itself as a **primary source**: commit it to a throwaway branch, out of main, and leave a context pointer to that branch on the implementation issue. Capture the answer too (the verdict and the question it settled) in the issue or a commit. The main branch keeps only the validated decision.
+1. **처음부터 1회용임을 명확히 표시하세요.** 프로토타입 코드는 실제 사용될 위치 인근에 배치하되, 이름에 프로토타입임을 명시하여 프로덕션 코드가 아님을 누구나 알 수 있게 합니다.
+2. **실행이 매우 간단해야 합니다.** UI 프로토타입은 단 하나의 명령어(`pnpm <이름>`, `python <경로>` 등)로 구동되고, 로직 데모는 더블 클릭으로 열리는 단일 HTML 파일이어야 합니다.
+3. **기본적으로 영속성을 두지 마세요.** 상태는 인메모리로 관리합니다. 영속성은 프로토타입이 검증하려는 대상이지 의존해야 할 대상이 아닙니다.
+4. **완벽한 마감은 생략하세요.** 테스트 코드 없음, 프로토타입이 동작하는 데 필요한 최소한 이상의 에러 처리 없음, 불필요한 추상화 없음. 목표는 빠르게 배우는 것입니다.
+5. **상태를 눈에 보이게 드러내세요.** 매 동작(로직) 또는 변형 전환(UI) 후 변경된 전체 상태를 화면에 출력하거나 렌더링하세요.
+6. **완료 후 기록을 보존하세요.** 검증된 결정은 실제 프로덕션 코드에 반영하고, 프로토타입 자체는 `prototype/<이름>` 임시 브랜치에 커밋하여 1차 출처로 보존한 뒤 구현 이슈에서 해당 브랜치를 참조하도록 링크를 남깁니다.

@@ -1,118 +1,21 @@
 ---
 name: migrate-to-shoehorn
-description: Migrate test files from `as` type assertions to @total-typescript/shoehorn. Use when user mentions shoehorn, wants to replace `as` in tests, or needs partial test data.
+description: 테스트 파일의 `as` 타입 단언을 @total-typescript/shoehorn으로 마이그레이션합니다. 테스트 코드에서 타입 안전한 부분 객체(Partial) 데이터가 필요할 때 사용합니다.
 ---
 
-# Migrate to Shoehorn
+# Shoehorn으로 마이그레이션 (Migrate to Shoehorn)
 
-## Why shoehorn?
+`shoehorn`은 TypeScript의 정적 검사를 유지하면서 테스트에서 부분(Partial) 데이터를 안전하게 전달할 수 있도록 해줍니다. `as` 단언을 대체합니다.
 
-`shoehorn` lets you pass partial data in tests while keeping TypeScript happy. It replaces `as` assertions with type-safe alternatives.
+**테스트 코드 전용입니다. 프로덕션 코드에서는 사용하지 마세요.**
 
-**Test code only.** Never use shoehorn in production code.
+## 마이그레이션 패턴
 
-Problems with `as` in tests:
+- 거대한 객체에서 일부 속성만 필요할 때: `fromPartial({ ... })`
+- 의도적으로 잘못된 타입 전달(에러 테스트): `fromAny({ ... })`
 
-- Trained not to use it
-- Must manually specify target type
-- Double-as (`as unknown as Type`) for intentionally wrong data
-
-## Install
+## 설치
 
 ```bash
 npm i @total-typescript/shoehorn
 ```
-
-## Migration patterns
-
-### Large objects with few needed properties
-
-Before:
-
-```ts
-type Request = {
-  body: { id: string };
-  headers: Record<string, string>;
-  cookies: Record<string, string>;
-  // ...20 more properties
-};
-
-it("gets user by id", () => {
-  // Only care about body.id but must fake entire Request
-  getUser({
-    body: { id: "123" },
-    headers: {},
-    cookies: {},
-    // ...fake all 20 properties
-  });
-});
-```
-
-After:
-
-```ts
-import { fromPartial } from "@total-typescript/shoehorn";
-
-it("gets user by id", () => {
-  getUser(
-    fromPartial({
-      body: { id: "123" },
-    }),
-  );
-});
-```
-
-### `as Type` → `fromPartial()`
-
-Before:
-
-```ts
-getUser({ body: { id: "123" } } as Request);
-```
-
-After:
-
-```ts
-import { fromPartial } from "@total-typescript/shoehorn";
-
-getUser(fromPartial({ body: { id: "123" } }));
-```
-
-### `as unknown as Type` → `fromAny()`
-
-Before:
-
-```ts
-getUser({ body: { id: 123 } } as unknown as Request); // wrong type on purpose
-```
-
-After:
-
-```ts
-import { fromAny } from "@total-typescript/shoehorn";
-
-getUser(fromAny({ body: { id: 123 } }));
-```
-
-## When to use each
-
-| Function        | Use case                                           |
-| --------------- | -------------------------------------------------- |
-| `fromPartial()` | Pass partial data that still type-checks           |
-| `fromAny()`     | Pass intentionally wrong data (keeps autocomplete) |
-| `fromExact()`   | Force full object (swap with fromPartial later)    |
-
-## Workflow
-
-1. **Gather requirements** - ask user:
-   - What test files have `as` assertions causing problems?
-   - Are they dealing with large objects where only some properties matter?
-   - Do they need to pass intentionally wrong data for error testing?
-
-2. **Install and migrate**:
-   - [ ] Install: `npm i @total-typescript/shoehorn`
-   - [ ] Find test files with `as` assertions: `grep -r " as [A-Z]" --include="*.test.ts" --include="*.spec.ts"`
-   - [ ] Replace `as Type` with `fromPartial()`
-   - [ ] Replace `as unknown as Type` with `fromAny()`
-   - [ ] Add imports from `@total-typescript/shoehorn`
-   - [ ] Run type check to verify

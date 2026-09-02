@@ -1,3 +1,3 @@
-# Deprecated
+# 더 이상 사용되지 않는 스킬 (Deprecated)
 
-Skills I no longer use. This bucket is currently empty: a retired skill is deleted, and the changeset that removes it names whatever replaced it.
+더 이상 사용되지 않는 스킬 모음입니다. 현재 비어 있습니다: 폐기된 스킬은 삭제되며, 삭제 변경 세트에 대체재가 명시됩니다.

@@ -1,18 +1,12 @@
 ---
 name: claude-handoff
-description: Hand the current conversation off to a fresh background agent that picks up the work immediately.
-argument-hint: "What will the next session be used for?"
+description: 현재 대화를 백그라운드 에이전트에 즉시 인수인계하여 바로 작업을 이어받도록 합니다.
+argument-hint: "다음 세션에서 어떤 작업을 주로 진행할 예정인가요?"
 disable-model-invocation: true
 ---
 
-Write a handoff summary of the current conversation so a fresh agent can continue the work. Save it to the temporary directory of the user's OS, then launch a background agent seeded with it as its prompt: `claude --bg --name "<descriptive name>" -- "$(cat <summary file>)"`. Passing the file keeps the shell from running backticks or expanding `$` in the summary. It starts in the current working directory and returns immediately; the user manages it with `claude agents`.
+새로운 에이전트가 작업을 이어갈 수 있도록 현재 대화의 인수인계 요약본을 작성하세요. 사용자 OS의 임시 디렉토리에 저장한 뒤, 이를 프롬프트로 시딩하여 백그라운드 에이전트를 실행합니다: `claude --bg --name "<설명적인 이름>" -- "$(cat <요약 파일>)"`. 파일을 이렇게 전달하면 셸이 요약본 내의 백틱을 실행하거나 `$`를 확장하는 것을 방지할 수 있습니다. 현재 작업 디렉토리에서 시작되며 즉시 반환됩니다; 사용자는 `claude agents`로 이를 관리합니다.
 
-Always pass `-n`/`--name` with a descriptive name (e.g. `--name "Fix login bug"`); it sets the display name shown in the job list, session picker, and terminal title.
+항상 `-n`/`--name`에 구체적인 이름(예: `--name "로그인 버그 수정"`)을 지정하세요.
 
-Include a "suggested skills" section in the summary, naming which skills the next agent should call the Skill tool for.
-
-Do not duplicate content already captured in other artifacts (specs, plans, ADRs, issues, commits, diffs). Reference them by path or URL instead.
-
-Redact any sensitive information, such as API keys, passwords, or personally identifiable information, since the summary becomes the agent's prompt.
-
-If the user passed arguments, treat them as a description of what the next session will focus on and tailor the summary accordingly.
+요약본에 "추천 스킬(Suggested skills)" 섹션을 포함하세요. 민감한 정보(API 키, 비밀번호 등)는 반드시 마스킹하세요.

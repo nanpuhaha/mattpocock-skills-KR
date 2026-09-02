@@ -1,38 +1,38 @@
 ---
 name: tdd
-description: Test-driven development. Use when the user wants to build features or fix bugs test-first, mentions "red-green-refactor", or wants integration tests.
+description: 테스트 주도 개발(TDD). 기능을 테스트 우선으로 구현하거나 버그를 잡을 때, "Red-Green-Refactor"를 언급하거나 통합 테스트를 작성하고자 할 때 사용합니다.
 ---
 
-# Test-Driven Development
+# 테스트 주도 개발 (Test-Driven Development)
 
-TDD is the red → green loop. This skill is the reference that makes that loop produce tests worth keeping: what a good test is, where tests go, the anti-patterns, and the rules of the loop. Every section applies on every cycle: consult them before and during the loop, not after.
+TDD는 Red(실패) → Green(성공) 루프입니다. 이 스킬은 그 루프가 지속적으로 보존할 가치가 있는 훌륭한 테스트를 생산하도록 돕는 기준 문서입니다: 좋은 테스트의 정의, 테스트를 배치할 위치, 안티패턴, 루프의 규칙을 제시합니다.
 
-When exploring the codebase, read `GLOSSARY.md` (if it exists) so test names and interface vocabulary match the project's domain language, and respect ADRs in the area you're touching.
+코드베이스를 탐색할 때 `GLOSSARY.md`가 있다면 읽어서 테스트명과 인터페이스 어휘가 프로젝트 도메인 언어와 일치하도록 하고, 작업 영역의 ADR을 준수하세요.
 
-## What a good test is
+## 좋은 테스트란 무엇인가
 
-Tests verify behavior through public interfaces, not implementation details. Code can change entirely; tests shouldn't. A good test reads like a specification: "user can checkout with valid cart" tells you exactly what capability exists, and it survives refactors because it doesn't care about internal structure.
+테스트는 구현 세부사항이 아니라 **공개 인터페이스를 통한 동작**을 검증합니다. 내부 코드는 완전히 바뀔 수 있어도 테스트는 유지되어야 합니다. 좋은 테스트는 스펙처럼 읽힙니다: "유효한 장바구니로 결제할 수 있다"는 테스트는 존재하는 기능을 정확히 알려주며, 내부 구조에 관심이 없으므로 리팩터링 후에도 깨지지 않고 살아남습니다.
 
-See [tests.md](tests.md) for examples and [mocking.md](mocking.md) for mocking guidelines.
+예시는 [tests.md](tests.md)를, 모킹 가이드는 [mocking.md](mocking.md)를 참조하세요.
 
-## Seams: where tests go
+## 경계선(Seam): 테스트를 배치할 위치
 
-A **seam** is the public boundary you test at: the interface where you observe behavior without reaching inside. Tests live at seams, never against internals.
+**경계선(Seam)** 은 테스트를 수행하는 공개 인터페이스 경계입니다. 내부에 침투하지 않고 동작을 관찰할 수 있는 위치를 의미합니다. 테스트는 항상 경계선에 존재해야 하며, 내부 구현체를 대상으로 해서는 안 됩니다.
 
-**Test only at pre-agreed seams.** Before writing any test, write down the seams under test and confirm them with the user. No test is written at an unconfirmed seam. You can't test everything, so agreeing the seams up front is how testing effort lands on the critical paths and complex logic instead of every edge case.
+**사전에 합의된 경계선에서만 테스트하세요.** 테스트를 작성하기 전에 테스트할 경계선을 명시하고 사용자와 확인하세요. 합의되지 않은 경계선에는 테스트를 작성하지 않습니다.
 
-Ask: "What's the public interface, and which seams should we test?" Give each proposed seam a one-line note on what it catches and what it misses.
+질문하세요: "공개 인터페이스는 무엇이며, 어떤 경계선을 테스트해야 합니까?" 제안하는 각 경계선마다 무엇을 포착하고 무엇을 놓치는지에 대한 한 줄 노트를 함께 제공하세요.
 
-When the shape of that interface is itself in question (how deep the module is, where the seam belongs, what the interface should expose), call the Skill tool with "codebase-design" for the vocabulary. It is the shared source of the module, interface, depth, seam, adapter, leverage and locality terms, and it is a reference to consult, not a session to run.
+인터페이스의 형태 자체가 고민스러울 때는 "codebase-design" 스킬을 호출하여 용어와 원칙을 확인하세요.
 
-## Anti-patterns
+## 안티패턴 (Anti-patterns)
 
-- **Implementation-coupled**: mocks internal collaborators, tests private methods, or verifies through a side channel (querying the database instead of using the interface). The tell: the test breaks when you refactor but behavior hasn't changed.
-- **Tautological**: the assertion recomputes the expected value the way the code does (`expect(add(a, b)).toBe(a + b)`, a snapshot derived by hand the same way, a constant asserted equal to itself), so it passes by construction and can never disagree with the code. Expected values must come from an independent source of truth: a known-good literal, a worked example, the spec.
-- **Horizontal slicing**: writing all tests first, then all implementation. Bulk tests verify _imagined_ behavior: you test the _shape_ of things rather than user-facing behavior, the tests go insensitive to real changes, and you commit to test structure before understanding the implementation. Work in **vertical slices** instead: one test → one implementation → repeat, each test a **tracer bullet** that responds to what the last cycle taught you.
+- **구현 결합 테스트**: 내부 협력자를 모킹하거나, 프라이빗 메서드를 테스트하거나, 부수 채널(인터페이스 대신 DB 직접 쿼리)로 검증하는 테스트. 증상: 동작은 그대로인데 리팩터링만 하면 테스트가 깨짐.
+- **동어반복(Tautological) 테스트**: 단언문(Assertion)이 코드와 동일한 방식으로 기댓값을 재계산하는 테스트 (`expect(add(a, b)).toBe(a + b)`). 코드가 틀려도 항상 통과함. 기댓값은 독립된 진실의 출처(하드코딩된 리터럴, 실제 계산 예시, 스펙)에서 가져와야 함.
+- **수평적 슬라이싱 (Horizontal slicing)**: 모든 테스트를 먼저 다 작성한 후 모든 구현을 나중에 하는 방식. 한 번에 하나씩 **수직 슬라이스 (Vertical slice)** 로 작업하세요: 하나의 테스트 → 하나의 최소 구현 → 반복 (각 테스트가 이전 사이클에서 배운 점을 반영하는 **트레이서 불릿** 역할).
 
-## Rules of the loop
+## 루프의 규칙
 
-- **Red before green.** Write the failing test first, then only enough code to pass it. Don't anticipate future tests or add speculative features.
-- **One slice at a time.** One seam, one test, one minimal implementation per cycle.
-- **Refactoring is not part of the loop.** It belongs to the review stage (see the `code-review` skill), not the red → green implementation cycle.
+- **Green 전에 Red.** 반드시 실패하는 테스트를 먼저 작성하고, 이를 통과시키는 데 필요한 최소한의 코드만 작성하세요.
+- **한 번에 하나의 슬라이스.** 한 사이클에 하나의 경계선, 하나의 테스트, 하나의 최소 구현만 진행합니다.
+- **리팩터링은 Red-Green 루프의 일부가 아닙니다.** 리팩터링은 리뷰 단계(`code-review` 스킬)에 속하며, 구현 루프 도중에는 동작 구현에만 집중합니다.

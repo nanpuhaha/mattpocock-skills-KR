@@ -1,32 +1,28 @@
-# RESOURCES.md Format
+# RESOURCES.md 작성 형식
 
-`RESOURCES.md` is the curated set of trusted sources for this topic. Knowledge for explainers should be drawn from here, not from parametric guesses. Wisdom comes from the communities listed here.
+`RESOURCES.md`는 해당 주제에 대해 검증된 신뢰도 높은 출처 모음입니다.
 
-## Structure
+## 구조
 
 ```md
-# {Topic} Resources
+# {주제} 참고 자료
 
-## Knowledge
+## 지식 (Knowledge)
 
-- [Book: _The Science and Practice of Strength Training_ by Zatsiorsky & Kraemer](https://example.com)
-  Foundational text on programming and adaptation. Use for: anything to do with periodisation, recovery, intensity zones.
-- [Article: "How Much Should I Train?" by Greg Nuckols (Stronger By Science)](https://example.com)
-  Evidence-based review of volume landmarks. Use for: weekly set targets per muscle group.
+- [도서: _The Science and Practice of Strength Training_ (Zatsiorsky & Kraemer)](https://example.com)
+  주기화, 회복, 강도 구간 등 프로그래밍과 적응의 기초 서적.
+- [아티클: "How Much Should I Train?" (Greg Nuckols)](https://example.com)
+  근육군별 주당 세트 목표치에 대한 근거 기반 리뷰.
 
-## Wisdom (Communities)
+## 지혜 / 커뮤니티 (Wisdom)
 
 - [r/weightroom](https://reddit.com/r/weightroom)
-  High-signal subreddit, moderated against bro-science. Use for: programme critique, plateau troubleshooting.
-- Local: Tuesday strength class at {gym name}
-  Use for: real-time coaching feedback on lifts.
+  비과학적 정보를 배제하는 신뢰도 높은 레딧 커뮤니티.
 ```
 
-## Rules
+## 작성 규칙
 
-- **High-trust only.** Prefer primary sources, recognised experts, peer-reviewed work, and communities with strong moderation. If a resource is marketing dressed as education, leave it out.
-- **Annotate every entry.** A bare link is useless in three months. Add one line: what it covers and when to reach for it.
-- **Group by Knowledge / Wisdom.** Mirrors the philosophy in [SKILL.md](./SKILL.md). It is fine for a resource to appear in only one group.
-- **Surface gaps explicitly.** If no good resource exists for an area the mission needs, write a `## Gaps` section listing what is missing. This drives future search.
-- **Prune ruthlessly.** A resource that turned out to be wrong, shallow, or off-mission should be removed, not buried. Better five sharp sources than thirty mediocre ones.
-- **Record community preferences.** If the user has opted out of joining communities, note it here so future sessions don't keep proposing them.
+- **높은 신뢰도의 출처만 등록하세요.**
+- **모든 항목에 설명을 덧붙이세요.** (무엇을 다루고 언제 참조해야 하는지 1줄 요약)
+- **지식과 지혜로 구분하세요.**
+- **주기적으로 과감하게 정리하세요.** (30개의 평범한 출처보다 5개의 날카로운 출처가 낫습니다.)

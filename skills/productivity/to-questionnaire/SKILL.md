@@ -1,54 +1,49 @@
 ---
 name: to-questionnaire
-description: Turn a decision you can't fully answer into a questionnaire for someone else to fill in.
+description: 혼자 결정할 수 없는 문제를 다른 사람(담당자/전문가)이 작성할 수 있는 설문지(Questionnaire)로 변환합니다.
 disable-model-invocation: true
 ---
 
-Turn something the user can't answer alone into a **questionnaire**: a Markdown document they hand to one person to fill in async, or fill out together over a meeting. The recipient holds knowledge the user lacks; the questionnaire pulls it out of them.
+혼자서 답을 내릴 수 없는 문제를 **설문지(Questionnaire)** 로 변환합니다: 비동기로 작성하도록 전달하거나 미팅에서 함께 채워나갈 수 있는 마크다운 문서입니다. 수신자는 사용자가 모르는 지식을 가지고 있으며, 설문지는 이를 효과적으로 끌어냅니다.
 
-**Grill the send, not the subject.** Interview the user only about the _send_, which they can always answer: who it goes to, and what they need back. The questions in the document then target the **gap** between what the recipient knows and what the user needs.
+**주제가 아닌 발송(Send) 맥락을 심문하세요.** 사용자에게 수신 대상(누구에게 보내는지)과 회신받아야 할 내용(무엇이 필요한지)만 인터뷰합니다.
 
+1. **누구에게 보내는가?** 수신자의 역할, 전문 분야, 사용자와의 관계.
+2. **무엇을 회신받아야 하는가?** 사용자 혼자서는 해결할 수 없어 필요한 구체적인 결정 사항이나 사실 목록.
+3. **설문지 작성:** `to-questionnaire-<슬러그>.md` 파일로 작성.
 
-1. **Who is it going to?** Ask, in one exchange, the recipient's role, expertise, and relationship to the user. This fixes the questionnaire's tone and how much context it must carry. Done when you know who the recipient is and what they know that the user doesn't.
-
-2. **What do you need back?** Ask, in one exchange, the specific decisions or facts the user can't resolve alone and needs from this person. Done when you have a concrete list of what the user must walk away able to do or decide.
-
-3. **Write the questionnaire.** Draft questions aimed at the gap from steps 1–2, following the Document structure below. Write it to `to-questionnaire-<slug>.md` in the current directory (slug from the topic) and report the path. Done when the file exists and every item the user named in step 2 is covered by a question.
-
-## Document structure
-
-Frame the document as a **discovery questionnaire**: the user lacks context, the recipient holds it. Order questions most-important-first, since async means you may only get one pass, and group them under `##` headings by theme once there are more than a handful. Write it using the template below.
+## 문서 구조
 
 <questionnaire-template>
 
-# <Questionnaire title>
+# <설문지 제목>
 
-**Purpose:** why this questionnaire exists and the decision riding on it.
+**목적:** 이 설문지가 존재하는 이유 및 이에 달려있는 결정 사항.
 
-**From:** <the user>, **To:** <the recipient>, **How your answers will be used:** <where they go>
+**작성자:** <사용자>, **수신자:** <수신자>, **답변 활용처:** <결과가 전달될 곳>
 
-## Context
+## 배경 맥락 (Context)
 
-One paragraph orienting a recipient who wasn't in the user's head. Enough to answer well, not a page.
+수신자가 상황을 이해할 수 있도록 돕는 1개 문단.
 
-## How to answer
+## 작성 안내 (How to answer)
 
-Deadline and rough effort. Partial answers and "I don't know" are useful: flag anything you're unsure of rather than skipping it.
+마감 기한 및 예상 소요 시간. 부분적인 답변이나 "모름"도 유용함을 안내.
 
-## <Theme heading>
+## <주제별 소제목>
 
-One `##` section per theme. Under each, its questions, most-important-first. Every question is one idea, never compound, with an answer stub directly beneath, and a one-line _why this matters_ only where the question could be misread or invite a throwaway answer.
+가장 중요한 질문 우선 배치. 질문 아래에 답변란(`>`)과 *이 질문이 중요한 이유* 명시.
 
 <question-example>
-### What load is the system expected to handle at launch?
+### 출시 시점에 시스템이 감당해야 할 예상 트래픽 부하는 어느 정도인가요?
 
-_Why this matters: it decides whether we provision for burst traffic now or defer it._
+_이 질문이 중요한 이유: 지금 버스트 트래픽을 대비해 인프라를 프로비저닝할지, 나중으로 미룰지 결정하기 위함입니다._
 
->
+> 
 </question-example>
 
-## Anything else?
+## 기타 의견 (Anything else?)
 
-A closing catch-all: anything we didn't ask that we should know?
+우리가 미처 묻지 못했지만 꼭 알아야 할 다른 사항이 있나요?
 
 </questionnaire-template>

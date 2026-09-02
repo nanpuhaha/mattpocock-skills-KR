@@ -1,0 +1,78 @@
+name: Weekly Upstream Sync and Translation
+
+on:
+  schedule:
+    - cron: '0 0 * * 1' # 매주 월요일 00:00 UTC (한국 시간 오전 9:00)
+  workflow_dispatch: # 수동 실행 지원
+
+jobs:
+  sync-and-translate:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      issues: write
+
+    steps:
+      - name: Checkout Korean branch
+        uses: actions/checkout@v4
+        with:
+          ref: Korean
+          fetch-depth: 0
+
+      - name: Configure Git
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+
+      - name: Add Upstream Remote and Fetch
+        run: |
+          git remote add upstream https://github.com/mattpocock/skills.git || git remote set-url upstream https://github.com/mattpocock/skills.git
+          git fetch upstream main
+
+      - name: Merge Upstream Changes
+        id: merge
+        continue-on-error: true
+        run: |
+          echo "Attempting merge of upstream/main..."
+          if git merge upstream/main -m "chore(sync): merge upstream/main into Korean"; then
+            echo "success=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "success=false" >> "$GITHUB_OUTPUT"
+            echo "Merge conflict detected!"
+          fi
+
+      - name: Setup Node.js
+        if: steps.merge.outputs.success == 'true'
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Auto-translate Modified Markdown Files
+        if: steps.merge.outputs.success == 'true' && env.GEMINI_API_KEY != ''
+        env:
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+          GEMINI_MODEL: 'gemini-flash-latest'
+        run: |
+          node scripts/sync-translate.mjs --diff
+
+      - name: Commit and Push Changes
+        if: steps.merge.outputs.success == 'true'
+        run: |
+          if [ -n "$(git status --porcelain)" ]; then
+            git add .
+            git commit -m "chore(sync): sync upstream and auto-translate Korean documentation [skip ci]"
+            git push origin Korean
+          else
+            echo "No new changes or translations to commit."
+          fi
+
+      - name: Notify on Merge Conflict Failure
+        if: steps.merge.outputs.success == 'false'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh issue create \
+            --title "🚨 [Sync Conflict] upstream/main과 Korean 브랜치 간 충돌 발생" \
+            --body "주간 자동 동기화 도중 \`upstream/main\`과 \`Korean\` 브랜치 간 충돌(Conflict)이 발생했습니다. 수동으로 충돌을 해결한 뒤 푸시해 주세요." \
+            --repo "${{ github.repository }}"
+          exit 1

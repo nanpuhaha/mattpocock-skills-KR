@@ -1,44 +1,46 @@
 ---
 name: retro
-description: "Conduct a retrospective on a coding session."
+description: "코딩 세션에 대한 회고(Retrospective)를 진행합니다."
 disable-model-invocation: true
 ---
 
-The user has asked for a **retrospective**. You are suggesting improvements to the coding agent's **environment** to improve future runs.
+# 회고 (Retro)
 
-## Steps
+코딩 세션에 대한 회고를 진행하여, 향후 세션의 성능을 높이기 위한 에이전트 **환경(Environment)** 개선점을 제안합니다.
 
-1. Call the Skill tool with `writing-for-agents` for the writing style guide.
+## 단계
 
-2. Read the primary sources for the session the user specifies. This may mean searching through session logs on this machine. If the user doesn't specify a session, default to the current one.
+1. 문서 작성 스타일 가이드를 확인하기 위해 Skill 도구를 `writing-for-agents`로 호출합니다.
 
-3. Look for candidates for improvement in these categories.
+2. 사용자가 지정한 세션의 1차 출처를 읽습니다. 이는 이 머신의 세션 로그를 검색하는 것을 의미할 수 있습니다. 사용자가 세션을 지정하지 않은 경우 현재 세션을 기본값으로 합니다.
 
-- **Navigation**: how easy was it for the agent to find the right files? Are there hidden dependencies between files? Would a **navigation pointer** make it easier? _Use when_ the session took a long time to find a piece of information.
-- **Automated checks**: are there automated checks that could catch errors the agent made? Linting, typing, tests, filesystem linters? Read the repo's own check command first (its `package.json`/build-tool `lint`/`check` scripts, its CI workflow), so a check that already exists but sits unwired or silently broken is the finding, not a reinvention. A repo with no **guardrail** (no pre-commit hook and no CI job running its lint/typecheck/test command) is itself a finding: an un-linted repo is a standing missed opportunity, not a neutral default. _Use when_ the agent made a mistake an automated check could have caught, or the repo has no guardrail at all.
-- **Coding standards**: should the **reviewer agent** be given a new rule to enforce? Should an existing rule be removed or clarified? Classify the violation first: a **mechanical** one (a fixed syntactic pattern, a banned API, an import shape, a file-location rule) gets a deterministic check, full stop: a custom rule in the repo's own linter, a new pre-commit hook, or a new CI job, whichever the repo's language and existing guardrail make cheapest. Default to building the check over writing the rule. Reserve `CODING_STANDARDS.md` for genuine **judgement calls** (cross-file consistency, "matches the surrounding style," anything no guardrail could ever substitute for). _Use when_ the reviewer agent failed to catch a mistake.
-- **Global AGENTS.md**: are there any steering instructions that should be moved to coding standards (or automated checks) instead? _Use when_ the AGENTS.md file is particularly large - in the repo OR the user's global scope.
-- **Tool economy**: did the agent make expensive tool calls that could be streamlined? Is there any custom tooling (CLI's, MCP's) that is particularly token-inefficient? _Use when_ the agent made an expensive tool call.
-- **No-ops**: look for instructions in steering files that don't modify the agent's behavior. _Use when_ the steering files are large and unwieldy.
-- **Information access**: look for opportunities to increase the agent's access to information. Teeing dev server logs, readonly access to third-party services. _Use when_ a crucial piece of information was not available to the agent.
+3. 다음 범주에서 개선 후보를 탐색합니다:
 
-4. Present these candidates to the user, in order of severity.
+- **탐색 (Navigation)**: 에이전트가 올바른 파일을 찾는 것이 얼마나 쉬웠는가? 파일 간에 숨겨진 의존성이 있는가? **탐색 포인터**를 두면 더 수월해지는가? _사용 시점_: 세션에서 정보를 찾는 데 오랜 시간이 걸렸을 때.
+- **자동화된 검사 (Automated checks)**: 에이전트가 저지른 실수를 잡아낼 수 있는 자동화된 검사(린트, 타입, 테스트, 파일시스템 린터 등)가 있는가? 저장소 자체의 검사 명령어(`package.json`이나 빌드 도구의 `lint`/`check` 스크립트, CI 워크플로우 등)를 먼저 읽어, 이미 존재하지만 연결되지 않았거나 조용히 고장난 검사가 재발명이 아닌 발견점이 되도록 하세요. **가드레일**이 없는 저장소(pre-commit 훅도 없고 린트/타입체크/테스트 명령어를 실행하는 CI 작업도 없는 저장소)는 그 자체로 하나의 발견점입니다: 린트가 없는 저장소는 중립적인 기본 상태가 아니라 상시 놓치고 있는 기회입니다. _사용 시점_: 에이전트가 자동화된 검사로 잡을 수 있었던 실수를 저질렀거나 저장소에 가드레일이 전혀 없을 때.
+- **코딩 표준 (Coding standards)**: **리뷰어 에이전트**에 강제할 새로운 규칙을 부여해야 하는가? 기존 규칙을 제거하거나 명확히 해야 하는가? 먼저 위반을 분류하세요: **기계적인 위반**(고정된 구문 패턴, 금지된 API, 임포트 형태, 파일 위치 규칙 등)은 예외 없이 결정론적 검사(저장소 자체 린터의 커스텀 규칙, 새로운 pre-commit 훅, 새로운 CI 작업 중 저장소의 언어와 기존 가드레일 상 가장 비용이 적게 드는 방식)로 처리합니다. 규칙을 서술하기보다 검사를 구축하는 것을 기본으로 삼으세요. `CODING_STANDARDS.md`는 순수한 **판단 영역**(파일 간 일관성, "주변 스타일과 일치", 가드레일로 대체할 수 없는 모든 것)을 위해 아껴두세요. _사용 시점_: 리뷰어 에이전트가 실수를 잡지 못했을 때.
+- **전역 AGENTS.md**: 코딩 표준(또는 자동화된 검사)으로 옮겨야 할 가이드 지침이 있는가? _사용 시점_: 저장소 또는 사용자의 전역 범위에서 AGENTS.md 파일이 유난히 클 때.
+- **도구 경제성 (Tool economy)**: 에이전트가 간소화할 수 있었던 고비용 도구 호출을 수행했는가? 토큰 효율이 특히 떨어지는 커스텀 도구(CLI, MCP)가 있는가? _사용 시점_: 에이전트가 고비용 도구 호출을 수행했을 때.
+- **무동작 지침 (No-ops)**: 가이드 파일에서 에이전트의 동작을 변화시키지 못하는 지침을 찾으세요. _사용 시점_: 가이드 파일이 너무 크고 다루기 힘들 때.
+- **정보 접근성 (Information access)**: 에이전트의 정보 접근성을 높일 기회를 찾으세요. 개발 서버 로그 분기(teeing), 서드파티 서비스에 대한 읽기 전용 접근 등. _사용 시점_: 결정적인 정보에 에이전트가 접근할 수 없었을 때.
 
-## Reference
+4. 발견된 개선 후보들을 심각도 순으로 사용자에게 제시합니다.
 
-### Implementation vs Review
+## 참고 자료
 
-Remember that all work goes through two stages: implementation and review. The implementation agent has the most **context pressure**. They are responsible for exploration, writing code, and debugging failures.
+### 구현 vs 리뷰 (Implementation vs Review)
 
-The review agent has the least context pressure - it receives a diff, so no exploration needed. It often does not need to write code or debug.
+모든 작업은 구현과 리뷰라는 두 단계를 거친다는 점을 기억하세요. 구현 에이전트는 가장 큰 **컨텍스트 압박**을 받습니다. 탐색, 코드 작성, 실패 디버깅을 책임지기 때문입니다.
 
-This means that the review agent should be responsible for imposing coding standards, not the implementation agent.
+반면 리뷰 에이전트는 컨텍스트 압박이 가장 적습니다. diff를 전달받으므로 탐색이 필요하지 않습니다. 코드 작성이나 디버깅을 할 필요가 없는 경우가 대부분입니다.
 
-### Files
+즉, 코딩 표준을 강제하는 책임은 구현 에이전트가 아니라 리뷰 에이전트가 맡아야 합니다.
 
-You have access to several files in the repo:
+### 파일 (Files)
 
-- `CLAUDE.md`/`AGENTS.md`: these files are pushed to the context window of any agent working in this repo. They should be used incredibly sparingly, usually only for **navigation pointers** to other files.
-- `CODING_STANDARDS.md`: this file is read during review, not implementation. Add **navigation pointers** to docs folders if the standards file gets more than 1,000 lines long.
-- Docs: use docs as references files, pointed to by other files. Look for existing docs before writing new ones.
-- Skills: use skills for docs (since their description goes into the agent's context window), or for user-invoked commands. Follow the advice in the `writing-for-agents` skill.
+저장소에서 접근할 수 있는 여러 파일들:
+
+- `CLAUDE.md`/`AGENTS.md`: 이 저장소에서 작업하는 모든 에이전트의 컨텍스트 창에 주입되는 파일입니다. 극도로 아껴서 사용해야 하며, 보통 다른 파일을 가리키는 **탐색 포인터** 용도로만 사용해야 합니다.
+- `CODING_STANDARDS.md`: 이 파일은 구현 시가 아니라 리뷰 시에 읽힙니다. 표준 파일이 1,000줄을 넘어가면 docs 폴더로 향하는 **탐색 포인터**를 추가하세요.
+- Docs: 다른 파일들이 참조하는 레퍼런스 파일로 문서를 활용하세요. 새 문서를 작성하기 전에 기존 문서가 있는지 먼저 확인하세요.
+- Skills: 문서화 목적(스킬의 description이 에이전트의 컨텍스트 창에 들어가므로) 또는 사용자 호출 명령어 용도로 스킬을 활용하세요. `writing-for-agents` 스킬의 조언을 따르세요.

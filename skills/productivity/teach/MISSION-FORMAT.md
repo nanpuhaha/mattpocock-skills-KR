@@ -1,31 +1,28 @@
-# MISSION.md Format
+# MISSION.md 작성 형식
 
-`MISSION.md` lives at the workspace root. It captures the _reason_ the user is learning this topic. Every teaching decision (what to teach next, which resources to surface, which exercises to design) should trace back to this document.
+`MISSION.md`는 학습 작업 공간의 루트에 위치합니다. 사용자가 이 주제를 배우고자 하는 *목적*을 담고 있으며, 모든 교육적 결정의 나침반이 됩니다.
 
-## Template
+## 템플릿
 
 ```md
-# Mission: {Topic}
+# 미션: {주제}
 
-## Why
-{1-3 sentences. The concrete real-world goal the user is chasing. What changes in their life or work when they have this skill? Avoid abstract framings like "to understand X"; push for the underlying outcome.}
+## 배우려는 이유 (Why)
+{1~3문장. 사용자가 추구하는 구체적인 실제 목표. 이 스킬을 습득했을 때 삶이나 일에서 무엇이 달라지는가?}
 
-## Success looks like
-- {A specific, observable thing the user will be able to do}
-- {Another specific thing}
-- {…}
+## 성공의 기준 (Success looks like)
+- {사용자가 실제로 할 수 있게 될 구체적이고 관찰 가능한 행동 1}
+- {구체적인 행동 2}
 
-## Constraints
-- {Time, budget, prior commitments, learning preferences, anything that bounds the approach}
+## 제약 조건 (Constraints)
+- {시간, 예산, 사전 지식, 학습 선호도 등 접근 방식을 제한하는 요소}
 
-## Out of scope
-- {Adjacent topics the user explicitly does not want to chase right now, protecting the zone of proximal development}
+## 범위 제외 (Out of scope)
+- {현재 단계에서 다루지 않기로 명시한 인접 주제들}
 ```
 
-## Rules
+## 작성 규칙
 
-- **One mission per workspace.** If the user wants to learn two unrelated things, that is two workspaces.
-- **Concrete over abstract.** "Run a half marathon by October" beats "get fitter." "Ship a Rust CLI to my team" beats "learn Rust."
-- **Push back on vagueness.** If the user cannot articulate why, interview them before writing anything. A bad mission is worse than no mission.
-- **Revise when reality shifts.** Missions change. When the user's goal moves, update this file: don't leave a stale mission steering future sessions.
-- **Keep it short.** If `MISSION.md` runs past a screen, it has stopped being a compass and started being a plan.
+- **작업 공간당 1개의 미션.**
+- **추상적인 것보다 구체적인 목표.** ("Rust 배우기"보다 "팀을 위한 Rust CLI 배포하기")
+- **간결함 유지.** 나침반의 역할을 넘어서 장황한 계획서가 되지 않도록 합니다.
