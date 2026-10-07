@@ -14,3 +14,5 @@ npx skills@latest add mattpocock/skills --skill=<스킬이름>
 - **[writing-shape](./writing-shape/SKILL.md)**: 원자재 마크다운 파일을 가져와 각 단계에서 서식 선택을 조율하며 문단별로 한 편의 글로 구체화.
 - **[claude-handoff](./claude-handoff/SKILL.md)**: 현재 대화를 `claude --bg`를 통해 핸드오프 요약과 함께 즉시 작업을 이어받는 새로운 백그라운드 에이전트에 인수인계. 사용자 호출.
 - **[setup-ts-deep-modules](./setup-ts-deep-modules/SKILL.md)**: 각 패키지가 깊은 모듈이 되도록 TypeScript 저장소에 dependency-cruiser를 연결(하위 폴더에 구현 은닉, 진입점 파일을 통해서만 접근, 진입점을 통한 테스트 실행). 사용자 호출.
+- **[chief-of-staff](./chief-of-staff/SKILL.md)**: 서브에이전트들을 조율하여 단일 세션에서 장기적인 목표를 달성. 사용자 호출.
+

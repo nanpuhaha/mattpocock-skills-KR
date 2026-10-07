@@ -1,6 +1,6 @@
 ---
 name: pr
-description: "Use when writing a PR body."
+description: "PR 본문을 작성할 때 사용합니다."
 metadata:
   credits:
     skill: show-me
@@ -9,38 +9,38 @@ metadata:
     url: "https://github.com/humanlayer/skills/blob/main/plugins/show-me/skills/show-me/SKILL.md"
 ---
 
-Use this template for writing the PR body:
+PR(풀 리퀘스트) 본문을 작성할 때 다음 템플릿을 사용하세요:
 
 ```markdown
-## Summary
+## 요약 (Summary)
 
-<diagram, diff-sketch, or tree>
+<다이어그램, diff 스케치, 또는 트리 구조>
 
-## Evidence
+## 근거 자료 (Evidence)
 
-- **Before:** <screenshot/output/failing test run>
-  **After:** <screenshot/output/passing test run>
+- **이전 (Before):** <스크린샷/실행 출력/실패한 테스트 실행>
+  **이후 (After):** <스크린샷/실행 출력/통과한 테스트 실행>
 
-## Merge Danger
+## 병합 위험도 (Merge Danger)
 
-**Door:** <one-way or two-way>
+**결정 유형 (Door):** <단방향(one-way) 또는 양방향(two-way)>
 
-<optional: description>
+<선택 사항: 설명>
 
-**Blast Radius:** <one-word description>
+**영향 반경 (Blast Radius):** <한 단어 요약>
 
-<optional: potential ramifications of merge>
+<선택 사항: 병합 시 발생 가능한 잠재적 파급 효과>
 ```
 
-## Sections
+## 섹션 가이드 (Sections)
 
-Skip all preambles and keep prose brief. Use the user's domain language from `GLOSSARY.md`.
+불필요한 서론은 생략하고 간결한 산문체를 유지하세요. `GLOSSARY.md`에 정의된 사용자의 도메인 용어를 사용하세요.
 
-### Summary
+### 요약 (Summary)
 
-Pick the smallest view that makes the key point clear.
+핵심 내용을 가장 명확하게 전달할 수 있는 최소한의 시각적 요소를 선택하세요.
 
-- Show logic or an algorithm as pseudocode:
+- 로직이나 알고리즘은 의사코드(pseudocode)로 표현:
 
 ```text
 on(save)
@@ -50,7 +50,7 @@ on(save)
   return fresh result
 ```
 
-- Show runtime control flow as a call tree:
+- 런타임 제어 흐름은 호출 트리(call tree)로 표현:
 
 ```text
 submitForm
@@ -60,7 +60,7 @@ submitForm
   navigateToSession
 ```
 
-- Show UI structure as a component tree, including state and module boundaries that matter:
+- UI 구조는 중요한 상태 및 모듈 경계를 포함하여 컴포넌트 트리(component tree)로 표현:
 
 ```text
 <SessionPage> (apps/example/src/routes/session.tsx)
@@ -69,30 +69,30 @@ submitForm
     <RunSkillButton> (packages/ui)
 ```
 
-- Show file responsibility or a broad refactor as a shallow file tree:
+- 파일 책임이나 대규모 리팩터링은 얕은 파일 트리(shallow file tree)로 표현:
 
 ```text
 src/
-├── commands/       # parses user actions
-├── sessions/       # owns session state
-└── transport/      # sends API requests
+├── commands/       # 사용자 액션 파싱
+├── sessions/       # 세션 상태 관리
+└── transport/      # API 요청 전송
 ```
 
-- Show component interaction, control flow, or data flow with Mermaid:
+- 컴포넌트 간 상호작용, 제어 흐름, 데이터 흐름은 Mermaid 다이어그램으로 표현:
 
 ```mermaid
 sequenceDiagram
     participant User
     participant UI
     participant Daemon
-    User->>UI: choose command
-    UI->>Daemon: send expanded prompt
-    Daemon-->>UI: stream result
+    User->>UI: 명령어 선택
+    UI->>Daemon: 확장된 프롬프트 전달
+    Daemon-->>UI: 결과 스트리밍
 ```
 
-- Use `diff` when the point is what changes and the surrounding shape already exists. Match the diff shape to the topic.
+- 핵심이 '무엇이 바뀌었는가'이고 주변 구조가 이미 명확할 때는 `diff`를 사용하세요. 주제에 맞게 diff 형태를 조율합니다.
 
-For a component change:
+컴포넌트 변경의 경우:
 
 ```diff
  <SessionPage>
@@ -103,12 +103,12 @@ For a component change:
 +    <SkillResultCard />
 ```
 
-For a file-layout change:
+파일 레이아웃 변경의 경우:
 
 ```diff
  src/
  ├── commands/
-+│   └── show-me.ts       # expands the slash command
++│   └── show-me.ts       # 슬래시 명령어 확장
  ├── sessions/
 -└── transport.ts
 +└── transport/
@@ -116,7 +116,7 @@ For a file-layout change:
 +    └── stream.ts
 ```
 
-For a call-tree or call-stack change:
+호출 트리 또는 호출 스택 변경의 경우:
 
 ```diff
  submitForm
@@ -129,7 +129,7 @@ For a call-tree or call-stack change:
 +    subscribeToEvents
 ```
 
-For a state or control-flow change:
+상태 또는 제어 흐름 변경의 경우:
 
 ```diff
  on(save)
@@ -140,7 +140,7 @@ For a state or control-flow change:
 +  invalidate cache
 ```
 
-- Show the whole block when most of it is new, when omitted context would hide ownership or order, or when the user needs a copyable target shape:
+- 대부분이 새로운 내용이거나 생략 시 소유권이나 순서가 모호해질 때, 또는 사용자가 복사 가능한 완성형 코드가 필요할 때는 전체 블록을 보여주세요:
 
 ```ts
 function expandSkill(command: string): string {
@@ -149,22 +149,22 @@ function expandSkill(command: string): string {
 }
 ```
 
-#### Guidance
+#### 작성 지침
 
-Place each visual next to the short text it supports. Keep only the calls, files, props, states, and boundaries needed to answer the user's current question or the options to resolve the current discussion point.
+각 시각 자료는 이를 뒷받침하는 짧은 텍스트 바로 옆에 배치하세요. 사용자의 현재 질문에 답하거나 논의 지점을 해결하는 데 필요한 호출, 파일, props, 상태, 경계만 남기세요.
 
-You may use one of these, you may use several, it is unlikely you will use all of them. Use your judgement and don't overwhelm the user.
+이 중 하나를 사용할 수도 있고 몇 가지를 함께 사용할 수도 있지만, 모든 요소를 전부 나열할 필요는 없습니다. 사용자가 압도당하지 않도록 상황에 맞게 판단하세요.
 
-### Evidence
+### 근거 자료 (Evidence)
 
-Concrete evidence that the change works. Show a before and after.
+변경 사항이 정상 작동한다는 구체적인 근거입니다. 전/후(Before & After)를 함께 보여주세요.
 
-Screenshots are S-tier - when the environment is set up for it and the change is visual.
+스크린샷은 S티어입니다 (환경이 갖추어져 있고 시각적인 변경 사항일 때).
 
-Execution-based evidence is A-tier. Test results, console output. Show the exact test that now fails and passes, using pseudocode.
+실행 기반 근거는 A티어입니다. 테스트 결과, 콘솔 출력 등이 해당합니다. 의사코드를 활용하여 기존에 실패했다가 이제 통과하는 정확한 테스트를 명시하세요.
 
-### Merge Danger
+### 병합 위험도 (Merge Danger)
 
-Describe whether it's a one-way or two-way door. You can walk back through two-way doors, but not one-way doors. A PR that is cheap to roll back is lower risk. Changes that involve destructive actions or hard-to-reverse decisions are one-way doors.
+단방향 문(one-way door)인지 양방향 문(two-way door)인지 명시하세요. 양방향 문은 다시 돌아 나올 수 있지만, 단방향 문은 되돌리기 어렵습니다. 롤백 비용이 적은 PR은 위험도가 낮습니다. 파괴적인 작업이나 되돌리기 힘든 결정이 포함된 변경 사항은 단방향 문입니다.
 
-The blast radius is the potential impact or scope of the changes introduced by this PR. Consider all possibilities. Examples are layout shift, breakages for consumers, mobile responsiveness, etc.
+영향 반경(Blast radius)은 이 PR로 인해 도입되는 변경 사항의 잠재적 영향 범위입니다. 모든 가능성을 고려하세요. 예: 레이아웃 틀어짐(layout shift), 외부 소비자에 미치는 영향, 모바일 반응형 깨짐 등.
